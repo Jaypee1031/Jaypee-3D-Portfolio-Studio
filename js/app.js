@@ -424,6 +424,269 @@
     }
   }
 
+  /**
+   * 8. Playable 3D Rubik's Cube Matrix Modal (Honoring Jaypee1031's `rubicks_cube` Repo!)
+   */
+  class CyberRubikGame {
+    constructor() {
+      this.modal = document.getElementById('rubik-modal-backdrop');
+      this.stageBox = document.getElementById('rubik-stage-box');
+      this.moveEl = document.getElementById('rubik-move-count');
+      this.timerEl = document.getElementById('rubik-timer');
+      this.statusEl = document.getElementById('rubik-status');
+      if (!this.modal || !this.stageBox || typeof THREE === 'undefined') return;
+
+      this.initialized = false;
+      this.active = false;
+      this.isAnimating = false;
+      this.cubies = [];
+      this.moveHistory = [];
+      this.moveCount = 0;
+      this.startTime = Date.now();
+      this.clockInterval = null;
+
+      this.MOVE_MAP = {
+        U: { axis: 'y', coord: 1, dir: -1 },
+        D: { axis: 'y', coord: -1, dir: 1 },
+        R: { axis: 'x', coord: 1, dir: -1 },
+        L: { axis: 'x', coord: -1, dir: 1 },
+        F: { axis: 'z', coord: 1, dir: -1 },
+        B: { axis: 'z', coord: -1, dir: 1 }
+      };
+
+      this.bindControls();
+    }
+
+    initWebGL() {
+      if (this.initialized) return;
+      this.initialized = true;
+
+      const w = this.stageBox.clientWidth || 600;
+      const h = this.stageBox.clientHeight || 340;
+
+      this.scene = new THREE.Scene();
+      this.camera = new THREE.PerspectiveCamera(36, w / h, 0.1, 100);
+      this.camera.position.set(5.2, 4.3, 6.2);
+      this.camera.lookAt(0, 0, 0);
+
+      this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      this.renderer.setSize(w, h);
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      this.stageBox.innerHTML = '';
+      this.stageBox.appendChild(this.renderer.domElement);
+
+      this.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+      const dLight = new THREE.DirectionalLight(0xffffff, 1.5);
+      dLight.position.set(6, 10, 8);
+      this.scene.add(dLight);
+
+      this.cubeRoot = new THREE.Group();
+      this.cubeRoot.rotation.set(0.15, -0.35, 0);
+      this.scene.add(this.cubeRoot);
+
+      // Drag Orbit Controls
+      let dragging = false;
+      let px = 0;
+      let py = 0;
+
+      this.stageBox.addEventListener('mousedown', (e) => {
+        dragging = true;
+        px = e.clientX;
+        py = e.clientY;
+      });
+      window.addEventListener('mouseup', () => {
+        dragging = false;
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (!dragging || !this.active) return;
+        this.cubeRoot.rotation.y += (e.clientX - px) * 0.009;
+        this.cubeRoot.rotation.x = Math.max(-1.2, Math.min(1.2, this.cubeRoot.rotation.x + (e.clientY - py) * 0.009));
+        px = e.clientX;
+        py = e.clientY;
+      });
+
+      this.createCubies();
+      this.renderLoop();
+    }
+
+    createCubies() {
+      if (!this.cubeRoot) return;
+      this.cubies.forEach((c) => this.cubeRoot.remove(c));
+      this.cubies = [];
+      this.moveHistory = [];
+      this.moveCount = 0;
+      this.startTime = Date.now();
+      if (this.moveEl) this.moveEl.textContent = '0';
+      if (this.statusEl) this.statusEl.textContent = 'SOLVED';
+
+      const FACE_COLORS = [0xff2a54, 0xff7a00, 0xffffff, 0xccff00, 0x00ff88, 0x00f0ff];
+      const INNER_COLOR = 0x0a0a0f;
+      const geo = new THREE.BoxGeometry(0.91, 0.91, 0.91);
+
+      for (let x = -1; x <= 1; x++) {
+        for (let y = -1; y <= 1; y++) {
+          for (let z = -1; z <= 1; z++) {
+            const mats = [
+              new THREE.MeshStandardMaterial({ color: x === 1 ? FACE_COLORS[0] : INNER_COLOR, roughness: 0.18, metalness: 0.15 }),
+              new THREE.MeshStandardMaterial({ color: x === -1 ? FACE_COLORS[1] : INNER_COLOR, roughness: 0.18, metalness: 0.15 }),
+              new THREE.MeshStandardMaterial({ color: y === 1 ? FACE_COLORS[2] : INNER_COLOR, roughness: 0.18, metalness: 0.15 }),
+              new THREE.MeshStandardMaterial({ color: y === -1 ? FACE_COLORS[3] : INNER_COLOR, roughness: 0.18, metalness: 0.15 }),
+              new THREE.MeshStandardMaterial({ color: z === 1 ? FACE_COLORS[4] : INNER_COLOR, roughness: 0.18, metalness: 0.15 }),
+              new THREE.MeshStandardMaterial({ color: z === -1 ? FACE_COLORS[5] : INNER_COLOR, roughness: 0.18, metalness: 0.15 })
+            ];
+            const mesh = new THREE.Mesh(geo, mats);
+            mesh.position.set(x, y, z);
+            this.cubeRoot.add(mesh);
+            this.cubies.push(mesh);
+          }
+        }
+      }
+    }
+
+    rotateLayer(axis, layerCoord, dir, recordMove = true, onDone = null) {
+      if (this.isAnimating || !this.cubeRoot) return;
+      this.isAnimating = true;
+
+      const activeCubies = this.cubies.filter((c) => Math.round(c.position[axis]) === layerCoord);
+      const pivot = new THREE.Group();
+      this.cubeRoot.add(pivot);
+      activeCubies.forEach((c) => pivot.attach(c));
+
+      const targetAngle = (Math.PI / 2) * dir;
+      const duration = 165;
+      const t0 = performance.now();
+
+      const stepAnim = (now) => {
+        const p = Math.min(1, (now - t0) / duration);
+        const ease = 1 - Math.pow(1 - p, 3);
+        pivot.rotation[axis] = targetAngle * ease;
+
+        if (p < 1) {
+          requestAnimationFrame(stepAnim);
+        } else {
+          pivot.updateMatrixWorld();
+          activeCubies.forEach((c) => {
+            this.cubeRoot.attach(c);
+            c.position.set(
+              Math.round(c.position.x),
+              Math.round(c.position.y),
+              Math.round(c.position.z)
+            );
+          });
+          this.cubeRoot.remove(pivot);
+          if (recordMove) {
+            this.moveHistory.push({ axis, layerCoord, dir });
+            this.moveCount++;
+            if (this.moveEl) this.moveEl.textContent = String(this.moveCount);
+            if (this.statusEl) this.statusEl.textContent = 'IN PLAY';
+          }
+          this.isAnimating = false;
+          if (onDone) onDone();
+        }
+      };
+      requestAnimationFrame(stepAnim);
+    }
+
+    bindControls() {
+      document.querySelectorAll('[data-rubik-turn]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const m = this.MOVE_MAP[btn.getAttribute('data-rubik-turn')];
+          if (m) this.rotateLayer(m.axis, m.coord, m.dir, true);
+        });
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (!this.active) return;
+        const key = e.key.toUpperCase();
+        if (this.MOVE_MAP[key]) {
+          const m = this.MOVE_MAP[key];
+          this.rotateLayer(m.axis, m.coord, m.dir, true);
+        }
+      });
+
+      const scrambleBtn = document.getElementById('btn-rubik-scramble');
+      if (scrambleBtn) {
+        scrambleBtn.addEventListener('click', () => {
+          if (this.isAnimating) return;
+          const keys = Object.keys(this.MOVE_MAP);
+          let steps = 12;
+          const nextScramble = () => {
+            if (steps <= 0) {
+              if (this.statusEl) this.statusEl.textContent = 'SCRAMBLED';
+              return;
+            }
+            steps--;
+            const m = this.MOVE_MAP[keys[Math.floor(Math.random() * keys.length)]];
+            const dir = Math.random() > 0.5 ? m.dir : -m.dir;
+            this.rotateLayer(m.axis, m.coord, dir, true, nextScramble);
+          };
+          nextScramble();
+        });
+      }
+
+      const solveBtn = document.getElementById('btn-rubik-solve');
+      if (solveBtn) {
+        solveBtn.addEventListener('click', () => {
+          if (this.isAnimating || this.moveHistory.length === 0) return;
+          if (this.statusEl) this.statusEl.textContent = 'SOLVING...';
+          const nextSolve = () => {
+            if (this.moveHistory.length === 0) {
+              if (this.statusEl) this.statusEl.textContent = 'SOLVED!';
+              return;
+            }
+            const last = this.moveHistory.pop();
+            this.rotateLayer(last.axis, last.layerCoord, -last.dir, false, nextSolve);
+          };
+          nextSolve();
+        });
+      }
+
+      const resetBtn = document.getElementById('btn-rubik-reset');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          if (!this.isAnimating) this.createCubies();
+        });
+      }
+    }
+
+    open() {
+      if (!this.modal) return;
+      this.modal.classList.add('open');
+      this.active = true;
+      this.initWebGL();
+
+      // Ensure canvas matches modal layout dimensions
+      const w = this.stageBox.clientWidth || 600;
+      const h = this.stageBox.clientHeight || 340;
+      this.camera.aspect = w / h;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(w, h);
+
+      this.startTime = Date.now();
+      if (this.clockInterval) clearInterval(this.clockInterval);
+      this.clockInterval = setInterval(() => {
+        const sec = Math.floor((Date.now() - this.startTime) / 1000);
+        const m = String(Math.floor(sec / 60)).padStart(2, '0');
+        const s = String(sec % 60).padStart(2, '0');
+        if (this.timerEl) this.timerEl.textContent = `${m}:${s}`;
+      }, 1000);
+    }
+
+    stop() {
+      this.active = false;
+      if (this.clockInterval) {
+        clearInterval(this.clockInterval);
+        this.clockInterval = null;
+      }
+    }
+
+    renderLoop() {
+      requestAnimationFrame(() => this.renderLoop());
+      if (!this.active || !this.renderer) return;
+      this.renderer.render(this.scene, this.camera);
+    }
+  }
+
   window.addEventListener('DOMContentLoaded', () => {
     initHudClock();
     initThemeEngine();
@@ -432,5 +695,6 @@
     initCleanUrlNavigation();
     initContactForm();
     window.cyberSnakeGame = new CyberSnakeGame();
+    window.cyberRubikGame = new CyberRubikGame();
   });
 })();

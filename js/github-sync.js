@@ -233,13 +233,14 @@
       readmeFallback: `# Interactive Date Invitation App\n\nInteractive micro-experience built with vanilla JavaScript, audio triggers, and playful UI physics.`
     },
     'rubicks_cube': {
-      title: '3D Rubik’s Cube Spatial Experiment',
+      title: '3D Rubik’s Cube Spatial Matrix',
       category: 'creative',
-      categoryLabel: '3D SPATIAL LAB',
-      featured: false,
-      stack: ['3D Geometry', 'JavaScript', 'Matrix Rotations'],
-      summary: 'Spatial 3D puzzle experiment exploring multi-axis matrix rotations and interactive cube state manipulation (honored in our 3D Dock Mode [02: RUBIK]).',
-      readmeFallback: `# Rubik's Cube 3D Experiment\n\nInteractive 3D spatial cube puzzle project.`
+      categoryLabel: '3D WEBGL PUZZLE GAME',
+      featured: true,
+      playableRubik: true,
+      stack: ['Three.js WebGL', 'JavaScript', '3D Matrix Rotations', 'Auto-Solver'],
+      summary: 'Interactive 3D 3×3×3 Rubik’s Cube puzzle game with animated face rotations (U, D, L, R, F, B), one-click scramble, algorithmic auto-solver, and 360° orbit camera. Playable live inside this portfolio!',
+      readmeFallback: `# Rubik's Cube 3D Game 🧊\n\nInteractive 3D WebGL Rubik's Cube puzzle game with real-time face rotations, scramble generator, move counter, timer, and auto-solver.`
     },
     'mind': {
       title: 'Mind — Cognitive Concept Sandbox',
@@ -622,6 +623,7 @@
       categoryLabel: known ? known.categoryLabel : inferredLabel,
       featured: known ? known.featured : (rawRepo.stargazers_count > 0 || rawRepo.size > 5000),
       playableDemo: known ? Boolean(known.playableDemo) : false,
+      playableRubik: known ? Boolean(known.playableRubik) : (rawRepo.name === 'rubicks_cube'),
       summary: liveDescription || (known ? known.summary : `Open-source ${rawRepo.language || 'software'} repository created and maintained by John Paul Tuangco (@${GITHUB_USERNAME}) on GitHub.`),
       stack: known
         ? known.stack
@@ -918,6 +920,11 @@
                   🎮 PLAY SNAKE
                 </button>
               ` : ''}
+              ${r.playableRubik ? `
+                <button type="button" class="repo-mini-btn" data-open-rubik="true" style="border-color:var(--accent-primary);color:var(--accent-primary);">
+                  🧊 PLAY RUBIK'S
+                </button>
+              ` : ''}
               <a href="${r.htmlUrl}" target="_blank" rel="noopener" class="repo-mini-btn">
                 GITHUB ↗
               </a>
@@ -1031,6 +1038,11 @@
         if (snakeBtn && window.cyberSnakeGame) {
           window.cyberSnakeGame.open();
         }
+
+        const rubikBtn = e.target.closest('[data-open-rubik]');
+        if (rubikBtn && window.cyberRubikGame) {
+          window.cyberRubikGame.open();
+        }
       });
 
       // Close Modals
@@ -1038,6 +1050,7 @@
         btn.addEventListener('click', () => {
           document.querySelectorAll('.hud-modal-backdrop').forEach((m) => m.classList.remove('open'));
           if (window.cyberSnakeGame) window.cyberSnakeGame.stop();
+          if (window.cyberRubikGame) window.cyberRubikGame.stop();
         });
       });
     }

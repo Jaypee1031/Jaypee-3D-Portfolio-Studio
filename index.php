@@ -611,7 +611,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
               </div>
               <div class="creation-actions">
                 <button type="button" class="btn-hud primary" data-open-snake="true">🎮 PLAY CYBERPUNK SNAKE LIVE</button>
-                <a href="rubicks-cube" target="_blank" rel="noopener" class="btn-hud primary">🧊 PLAY 3D RUBIK'S CUBE LIVE ↗</a>
+                <button type="button" class="btn-hud primary" data-open-rubik="true">🧊 PLAY 3D RUBIK'S CUBE LIVE</button>
                 <a href="https://github.com/Jaypee1031/rubicks_cube" target="_blank" rel="noopener" class="btn-hud">RUBIK'S REPO ↗</a>
                 <a href="https://github.com/Jaypee1031/Snake" target="_blank" rel="noopener" class="btn-hud">SNAKE REPO ↗</a>
                 <a href="https://github.com/Jaypee1031/mosiac" target="_blank" rel="noopener" class="btn-hud">MOSAIC REPO ↗</a>
@@ -1016,6 +1016,43 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
           <button type="button" id="btn-restart-snake" class="hud-modal-close">RESTART</button>
         </div>
         <canvas id="snake-canvas" width="440" height="360"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 03 // PLAYABLE 3D RUBIK'S CUBE MATRIX (Jaypee1031/rubicks_cube)
+       ====================================================================== -->
+  <div id="rubik-modal-backdrop" class="hud-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="rubik-modal-title">
+    <div class="hud-modal" style="width:min(680px, 96vw);">
+      <div class="hud-modal-header">
+        <span id="rubik-modal-title">🧊 3D RUBIK'S CUBE MATRIX // JAYPEE1031/RUBICKS_CUBE</span>
+        <button type="button" class="hud-modal-close" data-close-modal="true">CLOSE ✕</button>
+      </div>
+      <div class="hud-modal-body" style="text-align:center;">
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;font-family:'JetBrains Mono',monospace;font-size:0.76rem;">
+          <span>DRAG CUBE TO ORBIT 360° • KEYS: [U D L R F B]</span>
+          <span>MOVES: <strong id="rubik-move-count" style="color:var(--accent-primary);">0</strong></span>
+          <span>TIME: <strong id="rubik-timer" style="color:var(--accent-primary);">00:00</strong></span>
+          <span>STATUS: <strong id="rubik-status" style="color:var(--status-online);">SOLVED</strong></span>
+        </div>
+
+        <div id="rubik-stage-box" style="width:100%;height:340px;background:#050508;border:1px solid var(--accent-primary);border-radius:10px;position:relative;overflow:hidden;cursor:grab;margin-bottom:14px;"></div>
+
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:10px;">
+          <button type="button" class="hud-modal-close" data-rubik-turn="U">U (Top)</button>
+          <button type="button" class="hud-modal-close" data-rubik-turn="D">D (Bottom)</button>
+          <button type="button" class="hud-modal-close" data-rubik-turn="L">L (Left)</button>
+          <button type="button" class="hud-modal-close" data-rubik-turn="R">R (Right)</button>
+          <button type="button" class="hud-modal-close" data-rubik-turn="F">F (Front)</button>
+          <button type="button" class="hud-modal-close" data-rubik-turn="B">B (Back)</button>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;">
+          <button type="button" id="btn-rubik-scramble" class="btn-hud primary" style="padding:8px 16px;">🔀 SCRAMBLE CUBE</button>
+          <button type="button" id="btn-rubik-solve" class="btn-hud" style="padding:8px 16px;border-color:var(--accent-primary);color:var(--accent-primary);">⚡ AUTO-SOLVE</button>
+          <button type="button" id="btn-rubik-reset" class="btn-hud" style="padding:8px 16px;">↺ RESET</button>
+        </div>
       </div>
     </div>
   </div>
