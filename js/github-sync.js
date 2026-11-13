@@ -24,6 +24,87 @@
    * any new description the user adds on GitHub in the future.
    */
   const REPO_ENRICHMENT_DB = {
+    '3D-Hand-Holo': {
+      title: 'HOLO HAND v3.0 — Webcam Hand-Tracking & Mystic 3D HUD',
+      category: 'creative',
+      categoryLabel: 'COMPUTER VISION + 3D HUD',
+      featured: true,
+      stack: ['MediaPipe / Hand Tracking', 'HTML5 Canvas', 'WebGL Shaders', 'Orbitron HUD', 'JavaScript'],
+      summary: 'Real-time webcam computer-vision hand tracking and holographic Doctor Strange mystic spell/HUD suite (HOLO HAND v3.0), featuring gesture recognition, particle shields, and neon cyan/magenta/gold visual shaders.',
+      readmeFallback: `# HOLO HAND v3.0 — Ultimate Holographic & Doctor Strange Mystic Suite\n\nReal-time webcam hand-tracking holographic interface and mystic particle engine built with HTML5 Canvas, WebGL, and JavaScript.`
+    },
+    'Admission-Portal-V2-Update': {
+      title: 'QSU Admission Portal V2 — Modular University System',
+      category: 'fullstack',
+      categoryLabel: 'PHP MVC + OMR + AI CHAT',
+      featured: true,
+      stack: ['PHP 8 MVC', 'MySQL', 'TCPDF / F1-A & F2 PDF', 'OMR Scanner', 'AI Chat Widget', 'JavaScript'],
+      summary: 'Next-generation Quirino State University (QSU) Admission Portal V2 featuring modular controllers, automated F1-A/F2 PDF claim stubs & test permits, OMR exam scanner integration, assessment questionnaires, and an AI assistant widget.',
+      readmeFallback: `# QSU Admission Portal V2 Update\n\nFull-stack modular university admission portal featuring applicant management, automated F1-A/F2 PDF generation, exam slot scheduling, OMR scanner tools, and analytics.`
+    },
+    'Appointment-in-Guidance': {
+      title: 'Appointment in Guidance — Multi-Role Portal (V2)',
+      category: 'fullstack',
+      categoryLabel: 'STUDENT • COUNSELOR • PRINCIPAL',
+      featured: true,
+      stack: ['PHP 8', 'MySQL', 'REST API v2', 'Smart Concern AI Suggest', 'JavaScript'],
+      summary: 'Upgraded 3-role guidance counseling portal (Student, Guidance Counselor, and Principal dashboards) featuring automated concern classification, counselor handover workflows, urgent notifications, and feedback analytics.',
+      readmeFallback: `# Appointment in Guidance Portal\n\nMulti-role guidance counseling web portal supporting Student, Counselor, and Principal workflows.`
+    },
+    'Appointment-in-Guidance-App': {
+      title: 'Appointment in Guidance App — Full-Stack + Flutter Suite',
+      category: 'mobile',
+      categoryLabel: 'FLUTTER + PHP + PWA',
+      featured: true,
+      stack: ['Flutter', 'Dart', 'PHP 8 API', 'MySQL', 'PWA Service Worker'],
+      summary: 'Unified repository housing both the cross-platform Flutter application (`guidesched_app`), compiled Web/PWA assets, and the PHP/MySQL guidance counseling backend.',
+      readmeFallback: `# Appointment in Guidance App\n\nComplete cross-platform Flutter & PHP guidance scheduling suite.`
+    },
+    'GuideSched-App': {
+      title: 'GuideSched-App — Standalone Flutter Mobile & Web Client',
+      category: 'mobile',
+      categoryLabel: 'FLUTTER ANDROID / IOS / WEB',
+      featured: true,
+      stack: ['Flutter 3.x', 'Dart 3.x', 'Material 3', 'REST API Client', 'Multi-Role UI'],
+      summary: 'Standalone cross-platform Flutter client (`lib/screens/student`, `counselor`, `principal`) delivering native mobile, desktop, and web interfaces for the GuideSched counseling ecosystem.',
+      readmeFallback: `# GuideSched-App\n\nCross-platform Flutter client featuring dedicated Student, Counselor, and Principal screens.`
+    },
+    'Log-Book-OSAS': {
+      title: 'QSU OSAS Digital Logbook & Walk-In Kiosk System',
+      category: 'system',
+      categoryLabel: 'KIOSK + AUDIT LOGS + PHP',
+      featured: true,
+      stack: ['PHP 8 PDO', 'MySQL', 'Touch Kiosk UI', 'Audit Trail', 'CSV/Print Export'],
+      summary: 'Digital Student & Walk-in Data Collection Portal and full-screen Kiosk (`kiosk.php`) built for the QSU Office of Student Affairs and Services (OSAS), featuring dynamic logbook types, audit logs, and automated backups.',
+      readmeFallback: `# QSU OSAS Digital Logbook Portal\n\nStudent & Walk-in Data Collection Kiosk and Admin Portal styled in QSU Green (#006633).`
+    },
+    'Scholarship-Management-System': {
+      title: 'QSU OSAS Scholarship Management System',
+      category: 'fullstack',
+      categoryLabel: 'CUSTOM PHP MVC + TCPDF',
+      featured: true,
+      stack: ['PHP 8 Custom MVC', 'MySQL', 'TCPDF Generator', 'Custom Router', 'Role Auth'],
+      summary: 'Full-featured Academic and Service Scholarship Management Portal built for QSU OSAS using a custom PHP MVC front-controller router (`BaseController`, `BaseModel`), student application workflows, and automated PDF form generation.',
+      readmeFallback: `# QSU OSAS Scholarship Management System\n\nCustom MVC PHP web portal for managing Academic and Service Scholars at Quirino State University.`
+    },
+    'Student-Council-Portal': {
+      title: 'QSU Supreme Student Council 3D Portal & CMS',
+      category: 'creative',
+      categoryLabel: 'THREE.JS + ESBUILD + PHP 8',
+      featured: true,
+      stack: ['Three.js r187', 'esbuild', 'PHP 8 Strict Types', 'Custom CMS Admin', 'ESM JavaScript'],
+      summary: 'Official hub for the Quirino State University Supreme Student Council (Diffun • Cabarroguis • Maddela campuses), combining an interactive Three.js 3D hero scene (`heroScene.js`) with a live PHP JSON-backed Admin CMS (`admin.php`).',
+      readmeFallback: `# QSU Supreme Student Council 3D Portal\n\nInteractive Three.js + PHP 8 portal and content management system for the QSU Supreme Student Council.`
+    },
+    'Jaypee-3D-Portfolio-Studio': {
+      title: 'JAYPEE STUDIO — 3D WebGL Portfolio & GitHub Sync Engine',
+      category: 'creative',
+      categoryLabel: 'THREE.JS + LIVE GITHUB API',
+      featured: true,
+      stack: ['Three.js WebGL', '7-Theme Engine', 'GitHub REST API', 'PHP Proxy Cache', 'CSS3 HUD'],
+      summary: 'Interactive 3D cyber-brutalist studio portfolio featuring a procedurally sculpted glossy obsidian 3D bust with studio headphones, 4 switchable 3D rigs, 7 live color themes, and real-time GitHub repository synchronization.',
+      readmeFallback: `# JAYPEE STUDIO — 3D Portfolio\n\nInteractive Three.js 3D portfolio auto-synced with https://github.com/Jaypee1031.`
+    },
     'guidesched': {
       title: 'GuideSched — Counseling & Scheduling Platform',
       category: 'mobile',
@@ -172,13 +253,130 @@
       name: 'John Paul Tuangco (Fungus101)',
       avatar_url: 'https://avatars.githubusercontent.com/u/167046025?v=4',
       html_url: 'https://github.com/Jaypee1031',
-      public_repos: 15,
+      public_repos: 23,
       followers: 1,
       following: 0,
       created_at: '2024-04-15T02:08:38Z',
-      updated_at: '2026-09-07T05:37:05Z'
+      updated_at: '2026-11-13T07:21:00Z'
     },
     repos: [
+      {
+        name: 'Admission-Portal-V2-Update',
+        html_url: 'https://github.com/Jaypee1031/Admission-Portal-V2-Update',
+        description: 'Quirino State University (QSU) Admission Portal V2 — Full-Stack Modular University Admission, Applicant Verification & Automated PDF System',
+        language: 'PHP',
+        stargazers_count: 0,
+        forks_count: 0,
+        size: 48200,
+        created_at: '2026-11-13T07:20:00Z',
+        updated_at: '2026-11-13T07:21:30Z',
+        pushed_at: '2026-11-13T07:21:30Z',
+        topics: ['php', 'mvc', 'mysql', 'pdf', 'omr', 'qsu']
+      },
+      {
+        name: 'Scholarship-Management-System',
+        html_url: 'https://github.com/Jaypee1031/Scholarship-Management-System',
+        description: 'QSU OSAS Academic & Service Scholarship Management System — Custom PHP MVC Portal with Student & Admin Workflows and TCPDF Document Generation',
+        language: 'PHP',
+        stargazers_count: 0,
+        forks_count: 0,
+        size: 18400,
+        created_at: '2026-11-13T07:19:30Z',
+        updated_at: '2026-11-13T07:20:10Z',
+        pushed_at: '2026-11-13T07:20:10Z',
+        topics: ['php', 'mvc', 'scholarship', 'tcpdf', 'mysql']
+      },
+      {
+        name: 'Appointment-in-Guidance-App',
+        html_url: 'https://github.com/Jaypee1031/Appointment-in-Guidance-App',
+        description: 'Full-Stack Guidance Counseling Appointment & Scheduling Ecosystem with Flutter Mobile/Desktop Client & PHP 8 REST API',
+        language: 'Dart',
+        stargazers_count: 0,
+        forks_count: 0,
+        size: 14200,
+        created_at: '2026-11-13T07:19:15Z',
+        updated_at: '2026-11-13T07:19:50Z',
+        pushed_at: '2026-11-13T07:19:50Z',
+        topics: ['flutter', 'dart', 'php', 'mysql']
+      },
+      {
+        name: 'Appointment-in-Guidance',
+        html_url: 'https://github.com/Jaypee1031/Appointment-in-Guidance',
+        description: 'Multi-Role Guidance Counseling Appointment Portal (Student, Counselor & Principal Dashboards) with Smart Concern Suggestion API & Notifications',
+        language: 'PHP',
+        stargazers_count: 0,
+        forks_count: 0,
+        size: 3850,
+        created_at: '2026-11-13T07:19:05Z',
+        updated_at: '2026-11-13T07:19:35Z',
+        pushed_at: '2026-11-13T07:19:35Z',
+        topics: ['php', 'mysql', 'guidance', 'rest-api']
+      },
+      {
+        name: 'GuideSched-App',
+        html_url: 'https://github.com/Jaypee1031/GuideSched-App',
+        description: 'Cross-Platform Flutter Mobile, Desktop & Web Client for the GuideSched Guidance Counseling & Appointment System',
+        language: 'Dart',
+        stargazers_count: 0,
+        forks_count: 0,
+        size: 6250,
+        created_at: '2026-11-13T07:19:00Z',
+        updated_at: '2026-11-13T07:19:20Z',
+        pushed_at: '2026-11-13T07:19:20Z',
+        topics: ['flutter', 'dart', 'cross-platform']
+      },
+      {
+        name: 'Student-Council-Portal',
+        html_url: 'https://github.com/Jaypee1031/Student-Council-Portal',
+        description: 'Quirino State University (QSU) Supreme Student Council 3D Portal & CMS built with Three.js, esbuild & PHP 8',
+        language: 'JavaScript',
+        stargazers_count: 0,
+        forks_count: 0,
+        size: 2450,
+        created_at: '2026-11-13T07:18:10Z',
+        updated_at: '2026-11-13T07:18:45Z',
+        pushed_at: '2026-11-13T07:18:45Z',
+        topics: ['threejs', 'webgl', 'php8', 'esbuild', 'cms']
+      },
+      {
+        name: 'Log-Book-OSAS',
+        html_url: 'https://github.com/Jaypee1031/Log-Book-OSAS',
+        description: 'QSU OSAS Digital Logbook & Walk-In Kiosk Data Collection Portal with Audit Logs, Analytics & Automated Backups',
+        language: 'PHP',
+        stargazers_count: 0,
+        forks_count: 0,
+        size: 1730,
+        created_at: '2026-11-13T07:18:00Z',
+        updated_at: '2026-11-13T07:18:30Z',
+        pushed_at: '2026-11-13T07:18:30Z',
+        topics: ['php', 'pdo', 'kiosk', 'logbook', 'qsu']
+      },
+      {
+        name: '3D-Hand-Holo',
+        html_url: 'https://github.com/Jaypee1031/3D-Hand-Holo',
+        description: 'HOLO HAND v3.0 — Real-Time Webcam Hand-Tracking Holographic & Doctor Strange Mystic HUD Suite built with HTML5 Canvas, WebGL & Computer Vision',
+        language: 'HTML',
+        stargazers_count: 0,
+        forks_count: 0,
+        size: 120,
+        created_at: '2026-11-13T07:17:45Z',
+        updated_at: '2026-11-13T07:18:15Z',
+        pushed_at: '2026-11-13T07:18:15Z',
+        topics: ['hand-tracking', 'webgl', 'canvas', 'hologram']
+      },
+      {
+        name: 'Jaypee-3D-Portfolio-Studio',
+        html_url: 'https://github.com/Jaypee1031/Jaypee-3D-Portfolio-Studio',
+        description: 'JAYPEE STUDIO — Interactive 3D WebGL Portfolio & Live GitHub Auto-Sync Studio for John Paul Tuangco (@Jaypee1031)',
+        language: 'JavaScript',
+        stargazers_count: 0,
+        forks_count: 0,
+        size: 280,
+        created_at: '2026-11-13T07:18:20Z',
+        updated_at: '2026-11-13T07:19:00Z',
+        pushed_at: '2026-11-13T07:19:00Z',
+        topics: ['threejs', '3d-portfolio', 'github-api']
+      },
       {
         name: 'guidesched',
         html_url: 'https://github.com/Jaypee1031/guidesched',
