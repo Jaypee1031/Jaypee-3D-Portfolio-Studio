@@ -687,6 +687,123 @@
     }
   }
 
+  /**
+   * 9. Real-Time Visitor Heartbeat & Live Session Telemetry Radar
+   * Connects to clean extensionless endpoint: /api/visitors
+   */
+  function initRealtimeVisitors() {
+    const hudText = document.getElementById('hud-visitors-text');
+    const statOnline = document.getElementById('stat-live-online');
+    const statTotal = document.getElementById('stat-total-visits');
+    const modal = document.getElementById('visitors-modal-backdrop');
+
+    const vmOnline = document.getElementById('vm-online-now');
+    const vmToday = document.getElementById('vm-today-visits');
+    const vmUnique = document.getElementById('vm-unique-visitors');
+    const vmTotal = document.getElementById('vm-total-views');
+    const vmYourNode = document.getElementById('vm-your-node');
+    const vmActiveList = document.getElementById('vm-active-nodes-list');
+    const vmEventsList = document.getElementById('vm-recent-events');
+
+    let tabId = '';
+    try {
+      tabId = sessionStorage.getItem('jaypee_studio_tab_id') || '';
+      if (!tabId) {
+        tabId = 'tab_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now().toString(36);
+        sessionStorage.setItem('jaypee_studio_tab_id', tabId);
+      }
+    } catch (_) {
+      tabId = 'tab_default';
+    }
+
+    function getCurrentActiveSection() {
+      const activeLink = document.querySelector('.hud-nav-links a.active');
+      return (activeLink && activeLink.getAttribute('data-nav-section')) || 'home';
+    }
+
+    async function sendHeartbeat(isInitial = false) {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'noir';
+      const currentSection = getCurrentActiveSection();
+
+      try {
+        const res = await fetch('api/visitors', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            initial: isInitial,
+            tab_id: tabId,
+            section: currentSection,
+            theme: currentTheme
+          }),
+          cache: 'no-store'
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data || !data.ok) return;
+
+        if (hudText) {
+          hudText.textContent = `${data.online_now} ONLINE • ${data.total_views} VIEWS`;
+        }
+        if (statOnline) {
+          statOnline.textContent = String(data.online_now);
+        }
+        if (statTotal) {
+          statTotal.textContent = `${data.total_views} Total Visits • ${data.today_visits} Today • Click for Radar`;
+        }
+
+        if (vmOnline) vmOnline.textContent = String(data.online_now);
+        if (vmToday) vmToday.textContent = String(data.today_visits);
+        if (vmUnique) vmUnique.textContent = String(data.unique_visitors);
+        if (vmTotal) vmTotal.textContent = String(data.total_views);
+        if (vmYourNode && data.your_node) {
+          vmYourNode.textContent = `YOUR SESSION: ${data.your_node}`;
+        }
+
+        if (vmActiveList && Array.isArray(data.active_nodes)) {
+          vmActiveList.innerHTML = data.active_nodes.map((n) => {
+            const isSelf = n.node === data.your_node;
+            return `
+              <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;border:1px solid ${isSelf ? 'var(--accent-primary)' : 'var(--border-subtle)'};background:rgba(255,255,255,0.03);font-family:'JetBrains Mono',monospace;font-size:0.72rem;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="pulse-dot"></span>
+                  <strong style="color:var(--text-primary);">${n.node}${isSelf ? ' (YOU)' : ''}</strong>
+                  <span style="color:var(--text-muted);">• ${n.platform}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <span class="tech-pill">SECTION: /${n.section}</span>
+                  <span class="tech-pill">THEME: ${n.theme}</span>
+                  <span style="color:var(--status-online);">${n.seconds_ago <= 2 ? 'ACTIVE NOW' : n.seconds_ago + 's ago'}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        if (vmEventsList && Array.isArray(data.recent_events)) {
+          vmEventsList.innerHTML = data.recent_events.slice(0, 6).map((ev) => `
+            <div style="display:flex;justify-content:space-between;padding:6px 10px;border-bottom:1px solid var(--border-subtle);color:var(--text-secondary);">
+              <span>▸ <strong>${ev.node}</strong> navigated to <code>/${ev.section}</code> [Theme: ${ev.theme}]</span>
+              <span style="color:var(--text-muted);">${ev.platform}</span>
+            </div>
+          `).join('');
+        }
+      } catch (_) {}
+    }
+
+    // Open Visitors Radar Modal when clicking any [data-open-visitors] element
+    document.addEventListener('click', (e) => {
+      const trigger = e.target.closest('[data-open-visitors]');
+      if (trigger && modal) {
+        modal.classList.add('open');
+        sendHeartbeat(false);
+      }
+    });
+
+    // Send initial heartbeat immediately + poll every 8 seconds
+    sendHeartbeat(true);
+    setInterval(() => sendHeartbeat(false), 8000);
+  }
+
   window.addEventListener('DOMContentLoaded', () => {
     initHudClock();
     initThemeEngine();
@@ -694,6 +811,7 @@
     initSpatialInteractions();
     initCleanUrlNavigation();
     initContactForm();
+    initRealtimeVisitors();
     window.cyberSnakeGame = new CyberSnakeGame();
     window.cyberRubikGame = new CyberRubikGame();
   });

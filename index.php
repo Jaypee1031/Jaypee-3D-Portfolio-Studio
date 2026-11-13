@@ -45,6 +45,17 @@ if ($routeKey === '/rubicks-cube' || $routeKey === '/rubicks_cube') {
     exit;
 }
 
+if ($routeKey === '/api/visitors') {
+    if (!check_rate_limit('visitors_heartbeat', 120, 60)) {
+        http_response_code(429);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => false, 'error' => 'Rate limit exceeded']);
+        exit;
+    }
+    require __DIR__ . '/api/visitors-tracker.php';
+    exit;
+}
+
 if ($routeKey === '/api/github-sync') {
     if (!check_rate_limit('github_sync', 60, 60)) {
         http_response_code(429);
@@ -188,8 +199,12 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
         <div class="notch-top-line-right"></div>
       </nav>
 
-      <!-- Top-Right Live Local Time Readout & Security Shield Badge -->
+      <!-- Top-Right Live Local Time Readout, Real-Time Visitors Pill & Security Shield Badge -->
       <div class="hud-telemetry-right">
+        <button type="button" id="hud-visitors-btn" class="gh-live-pill" data-open-visitors="true" title="Click to open Real-Time Visitor Telemetry Radar">
+          <span class="pulse-dot"></span>
+          <span id="hud-visitors-text">1 ONLINE • LIVE</span>
+        </button>
         <span class="gh-live-pill" title="CSP Nonce + CSRF Token + WAF Shield + Extensionless Routing Active">
           🛡️ SECURED
         </span>
@@ -326,10 +341,10 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
               <div class="telemetry-label">Core Engineering Domains</div>
               <div class="telemetry-sub">Flutter • Full-Stack MVC • Three.js 3D • CV • Civic Tech</div>
             </div>
-            <div class="telemetry-card">
-              <div class="telemetry-value">SEC<span>✓</span></div>
-              <div class="telemetry-label">Hardened PHP Architecture</div>
-              <div class="telemetry-sub">CSP Nonce • CSRF • WAF • Extensionless Routing</div>
+            <div class="telemetry-card" data-open-visitors="true" style="cursor:pointer;" title="Click to inspect Live Visitor Radar">
+              <div class="telemetry-value"><span id="stat-live-online" style="color:var(--status-online);">1</span><span> ONLINE</span></div>
+              <div class="telemetry-label">Real-Time Active Visitors</div>
+              <div class="telemetry-sub" id="stat-total-visits">Syncing live visitor telemetry...</div>
             </div>
           </div>
 
@@ -1052,6 +1067,58 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
           <button type="button" id="btn-rubik-scramble" class="btn-hud primary" style="padding:8px 16px;">🔀 SCRAMBLE CUBE</button>
           <button type="button" id="btn-rubik-solve" class="btn-hud" style="padding:8px 16px;border-color:var(--accent-primary);color:var(--accent-primary);">⚡ AUTO-SOLVE</button>
           <button type="button" id="btn-rubik-reset" class="btn-hud" style="padding:8px 16px;">↺ RESET</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 04 // REAL-TIME VISITOR TELEMETRY & LIVE SESSION RADAR
+       ====================================================================== -->
+  <div id="visitors-modal-backdrop" class="hud-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="visitors-modal-title">
+    <div class="hud-modal" style="width:min(760px, 96vw);">
+      <div class="hud-modal-header">
+        <span id="visitors-modal-title" style="display:flex;align-items:center;gap:8px;">
+          <span class="pulse-dot"></span> REAL-TIME VISITOR TELEMETRY // LIVE RADAR
+        </span>
+        <button type="button" class="hud-modal-close" data-close-modal="true">CLOSE ✕</button>
+      </div>
+      <div class="hud-modal-body">
+        <!-- 4 Real-Time KPI Counters -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px;">
+          <div style="padding:16px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--text-muted);">ONLINE RIGHT NOW</div>
+            <div id="vm-online-now" style="font-family:'Teko',sans-serif;font-size:2.7rem;line-height:1;color:var(--status-online);margin-top:4px;">1</div>
+          </div>
+          <div style="padding:16px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--text-muted);">TODAY'S VISITS</div>
+            <div id="vm-today-visits" style="font-family:'Teko',sans-serif;font-size:2.7rem;line-height:1;color:var(--text-primary);margin-top:4px;">1</div>
+          </div>
+          <div style="padding:16px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--text-muted);">UNIQUE VISITORS</div>
+            <div id="vm-unique-visitors" style="font-family:'Teko',sans-serif;font-size:2.7rem;line-height:1;color:var(--accent-primary);margin-top:4px;">1</div>
+          </div>
+          <div style="padding:16px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--text-muted);">TOTAL STUDIO VIEWS</div>
+            <div id="vm-total-views" style="font-family:'Teko',sans-serif;font-size:2.7rem;line-height:1;color:var(--text-primary);margin-top:4px;">43</div>
+          </div>
+        </div>
+
+        <!-- Active Connected Nodes List -->
+        <div style="margin-bottom:22px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--accent-primary);">
+            <span>ACTIVE CONNECTED VISITOR NODES (45S HEARTBEAT WINDOW)</span>
+            <span id="vm-your-node">YOUR SESSION: NODE-0000</span>
+          </div>
+          <div id="vm-active-nodes-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+
+        <!-- Recent Activity Stream -->
+        <div>
+          <div style="margin-bottom:10px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--text-muted);">
+            RECENT LIVE SECTION &amp; THEME TELEMETRY LOG
+          </div>
+          <div id="vm-recent-events" style="display:flex;flex-direction:column;gap:6px;font-family:'JetBrains Mono',monospace;font-size:0.71rem;"></div>
         </div>
       </div>
     </div>
