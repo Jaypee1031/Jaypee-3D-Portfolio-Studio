@@ -159,14 +159,23 @@
       summary: 'Rapid emergency dispatch and citizen rescue coordination module designed for local disaster risk reduction and municipal response teams in Cordon, Isabela.',
       readmeFallback: `# Cordon-Rescue\n\nEmergency response and municipal rescue coordination repository for Cordon, Isabela.`
     },
-    'DTC-PROJECT': {
-      title: 'DTC Institutional Management System',
+    'DTC': {
+      title: 'DTC — QR Attendance, Foot Traffic & Training System',
       category: 'system',
-      categoryLabel: 'ENTERPRISE SYSTEM',
+      categoryLabel: 'QR SCANNER + FOOT TRAFFIC + PHP',
       featured: true,
-      stack: ['PHP', 'MySQL', 'Institutional ERP', 'Admin Dashboard'],
-      summary: 'Large-scale institutional project (~119 MB repository footprint) delivering digital campus operations, faculty workflows, and administrative reporting.',
-      readmeFallback: `# DTC-PROJECT\n\nComprehensive institutional management and digital campus workflow repository by John Paul Tuangco.`
+      stack: ['PHP 8', 'MySQL (salunat_dtc)', 'QR Code Scanner', 'Foot Traffic Analytics', 'JavaScript'],
+      summary: 'Digital Transformation Center (DTC) QR Code Attendance, Foot Traffic Monitoring (`Dtc_foot_traffic.php`), Event Attendance, and Training Management System with Admin, Staff, and User dashboards.',
+      readmeFallback: `# Digital Transformation Center (DTC) System\n\nQR Code Attendance, Foot Traffic Monitoring, Event Attendance, and Training Submission System built with PHP and MySQL.`
+    },
+    'DTC-PROJECT': {
+      title: 'DTC Institutional QR & Foot Traffic Suite',
+      category: 'system',
+      categoryLabel: 'QR ATTENDANCE + ANALYTICS',
+      featured: true,
+      stack: ['PHP', 'MySQL', 'QR Scanner', 'Foot Traffic Tracking', 'Admin Dashboard'],
+      summary: 'Complete Digital Transformation Center (DTC) management suite delivering QR attendance scanning, foot traffic telemetry, event tracking, and training approval workflows.',
+      readmeFallback: `# DTC-PROJECT\n\nDigital Transformation Center QR Attendance, Foot Traffic & Training Management System by John Paul Tuangco.`
     },
     'ATTENDANCE': {
       title: 'Salunat DTC Attendance & Travel Order Suite',

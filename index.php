@@ -558,11 +558,43 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
               </div>
             </article>
 
-            <!-- 7. Cyberpunk Neon Snake & Interactive 3D / Canvas Lab -->
-            <article class="creation-card" style="grid-column: span 12;">
+            <!-- 7. DTC — QR Code Attendance, Foot Traffic & Training System -->
+            <article class="creation-card">
               <div>
                 <div class="creation-top-meta">
-                  <span>07 // CREATIVE CODING &amp; INTERACTIVE ARCADE</span>
+                  <span>07 // DIGITAL TRANSFORMATION CENTER (DTC)</span>
+                  <span class="creation-badge">QR SCANNER + FOOT TRAFFIC + PHP</span>
+                </div>
+                <h3 class="creation-title">DTC QR ATTENDANCE &amp; FOOT TRAFFIC SYSTEM</h3>
+                <div class="creation-subtitle">github.com/Jaypee1031/DTC &amp; /DTC-PROJECT</div>
+                <p class="creation-desc">
+                  Comprehensive <strong>Digital Transformation Center (DTC)</strong> platform featuring real-time <strong>QR Code Attendance Scanning</strong> (`scan_qr.php`, `qr_in.php`), <strong>Foot Traffic Monitoring</strong> (`Dtc_foot_traffic.php`), event attendance logs, and training submission workflows across Admin, Staff, and User dashboards.
+                </p>
+                <ul class="creation-highlights">
+                  <li>Real-Time QR Code Check-In &amp; Event Attendance</li>
+                  <li>Facility Foot Traffic Tracking &amp; Telemetry</li>
+                  <li>Training Program Submission &amp; Approval Pipeline</li>
+                  <li>Role-Based Admin, Staff &amp; User Dashboards</li>
+                </ul>
+                <div class="tech-stack-row">
+                  <span class="tech-pill">PHP 8</span>
+                  <span class="tech-pill">MySQL (salunat_dtc)</span>
+                  <span class="tech-pill">QR Scanner</span>
+                  <span class="tech-pill">Foot Traffic Analytics</span>
+                </div>
+              </div>
+              <div class="creation-actions">
+                <a href="https://github.com/Jaypee1031/DTC" target="_blank" rel="noopener" class="btn-hud primary">OPEN DTC REPO ↗</a>
+                <a href="https://github.com/Jaypee1031/DTC-PROJECT" target="_blank" rel="noopener" class="btn-hud">DTC-PROJECT ↗</a>
+                <button type="button" class="btn-hud" data-inspect-repo="DTC">📄 LIVE README</button>
+              </div>
+            </article>
+
+            <!-- 8. Cyberpunk Neon Snake & Interactive 3D / Canvas Lab -->
+            <article class="creation-card">
+              <div>
+                <div class="creation-top-meta">
+                  <span>08 // CREATIVE CODING &amp; INTERACTIVE ARCADE</span>
                   <span class="creation-badge">PLAYABLE LIVE IN BROWSER</span>
                 </div>
                 <h3 class="creation-title">CYBERPUNK SNAKE, 3D RUBIK'S MATRIX &amp; MOSAIC LAB</h3>
