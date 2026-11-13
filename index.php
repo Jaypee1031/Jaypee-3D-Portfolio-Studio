@@ -40,6 +40,11 @@ $routeKey = rtrim($route, '/') ?: '/';
 // EXTENSIONLESS API ROUTES (/api/github-sync & /api/contact)
 // ============================================================================
 
+if ($routeKey === '/rubicks-cube' || $routeKey === '/rubicks_cube') {
+    require __DIR__ . '/rubicks_cube/index.php';
+    exit;
+}
+
 if ($routeKey === '/api/github-sync') {
     if (!check_rate_limit('github_sync', 60, 60)) {
         http_response_code(429);
@@ -574,6 +579,8 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
               </div>
               <div class="creation-actions">
                 <button type="button" class="btn-hud primary" data-open-snake="true">🎮 PLAY CYBERPUNK SNAKE LIVE</button>
+                <a href="rubicks-cube" target="_blank" rel="noopener" class="btn-hud primary">🧊 PLAY 3D RUBIK'S CUBE LIVE ↗</a>
+                <a href="https://github.com/Jaypee1031/rubicks_cube" target="_blank" rel="noopener" class="btn-hud">RUBIK'S REPO ↗</a>
                 <a href="https://github.com/Jaypee1031/Snake" target="_blank" rel="noopener" class="btn-hud">SNAKE REPO ↗</a>
                 <a href="https://github.com/Jaypee1031/mosiac" target="_blank" rel="noopener" class="btn-hud">MOSAIC REPO ↗</a>
               </div>
