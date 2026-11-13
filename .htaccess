@@ -1,0 +1,46 @@
+# ==============================================================================
+# JAYPEE STUDIO // APACHE SECURITY & EXTENSIONLESS CLEAN URL ROUTER
+# Ensures ZERO .php or .html extensions ever appear in the browser URL bar
+# Works seamlessly on XAMPP (/PORTFOLIO%20JP/) and Live Production Root (/)
+# ==============================================================================
+
+Options -Indexes -MultiViews
+DirectoryIndex index.php
+ServerSignature Off
+
+<IfModule mod_headers.c>
+    Header always unset X-Powered-By
+    Header unset X-Powered-By
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Block access to hidden files (.git, .env, .htaccess)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1. Block direct access to internal includes/ or api/cache/ directories
+    RewriteRule ^(includes|api/cache)(/|$) - [F,L]
+
+    # 2. If user/browser requests /index.php or /index.html directly, 301 redirect to clean base directory
+    RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.(php|html?)[\s?] [NC]
+    RewriteRule ^(.*)index\.(php|html?)$ %1 [R=301,L]
+
+    # 3. If user/browser requests ANY .php or .html file in the URL, 301 redirect to clean extensionless URL
+    RewriteCond %{THE_REQUEST} \s/+([^\s?]+)\.(php|html?)([\s?]|$) [NC]
+    RewriteRule ^ /%1 [R=301,L]
+
+    # 4. Serve existing static assets (css, js, images, fonts) directly
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_URI} !\.(php|html?)$ [NC]
+    RewriteRule ^ - [L]
+
+    # 5. Route all clean extensionless URLs (/works, /creations, /api/github-sync, /api/contact, etc.) to Front Controller
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>

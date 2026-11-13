@@ -142,14 +142,56 @@
   }
 
   /**
-   * 5. Navigation Active Spy
+   * 5. Clean Extensionless URL Router & Navigation Active Spy
+   * Guarantees ZERO .php or .html ever appears in the browser address bar.
    */
-  function initScrollSpy() {
-    const links = document.querySelectorAll('.hud-nav-links a[href^="#"]');
-    const sections = Array.from(links)
-      .map((link) => document.querySelector(link.getAttribute('href')))
-      .filter(Boolean);
+  function initCleanUrlNavigation() {
+    const basePath = document.documentElement.getAttribute('data-base-path') || '/';
+    const initialSection = document.documentElement.getAttribute('data-initial-section') || 'home';
+    const navLinks = document.querySelectorAll('[data-nav-section]');
+    const sectionIds = ['home', 'works', 'creations', 'about', 'services', 'contacts'];
+    const sections = sectionIds.map((id) => document.getElementById(id)).filter(Boolean);
 
+    // Immediately strip any .php or .html if ever present in location.pathname
+    if (/\.(php|html?)$/i.test(window.location.pathname)) {
+      const cleaned = window.location.pathname
+        .replace(/\/index\.(php|html?)$/i, '/')
+        .replace(/\.(php|html?)$/i, '');
+      window.history.replaceState({}, '', cleaned + window.location.search);
+    }
+
+    function buildCleanUrl(sectionId) {
+      const cleanBase = basePath.endsWith('/') ? basePath : basePath + '/';
+      return sectionId === 'home' ? cleanBase : `${cleanBase}${sectionId}`;
+    }
+
+    // If user landed directly on /works, /creations, /about, etc., scroll to it smoothly
+    if (initialSection && initialSection !== 'home') {
+      const targetEl = document.getElementById(initialSection);
+      if (targetEl) {
+        setTimeout(() => {
+          targetEl.scrollIntoView({ behavior: 'smooth' });
+        }, 150);
+      }
+    }
+
+    // Intercept clicks on clean extensionless nav links
+    navLinks.forEach((link) => {
+      link.addEventListener('click', (e) => {
+        const targetId = link.getAttribute('data-nav-section');
+        const targetSec = targetId ? document.getElementById(targetId) : null;
+        if (targetSec) {
+          e.preventDefault();
+          targetSec.scrollIntoView({ behavior: 'smooth' });
+          window.history.pushState({ section: targetId }, '', buildCleanUrl(targetId));
+          navLinks.forEach((l) => {
+            l.classList.toggle('active', l.getAttribute('data-nav-section') === targetId);
+          });
+        }
+      });
+    });
+
+    // Update active nav state & clean URL on scroll
     window.addEventListener('scroll', () => {
       const scrollPos = window.scrollY + 240;
       let currentId = 'home';
@@ -160,33 +202,64 @@
         }
       });
 
-      links.forEach((link) => {
-        link.classList.toggle('active', link.getAttribute('href') === `#${currentId}`);
+      navLinks.forEach((link) => {
+        if (link.closest('.hud-nav-links')) {
+          link.classList.toggle('active', link.getAttribute('data-nav-section') === currentId);
+        }
       });
     }, { passive: true });
   }
 
   /**
-   * 6. Contact Form Direct Dispatch Handler
+   * 6. CSRF-Protected Contact Form Dispatch Handler (Posts to clean /api/contact endpoint)
    */
   function initContactForm() {
     const form = document.getElementById('studio-contact-form');
     const feedback = document.getElementById('contact-form-feedback');
     if (!form) return;
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = (document.getElementById('cf-name')?.value || 'Visitor').trim();
+      const name = (document.getElementById('cf-name')?.value || '').trim();
       const email = (document.getElementById('cf-email')?.value || '').trim();
       const project = (document.getElementById('cf-project')?.value || 'Project Inquiry').trim();
       const message = (document.getElementById('cf-message')?.value || '').trim();
+      const csrfToken = document.getElementById('cf-csrf-token')?.value || '';
+      const websiteHp = document.getElementById('cf-website-hp')?.value || '';
 
-      if (feedback) {
-        feedback.style.display = 'block';
-        feedback.innerHTML = `✓ TRANSMISSION PREPARED FOR JOHN PAUL TUANGCO (@Jaypee1031) — Ready to connect regarding <strong>${project}</strong>.`;
+      try {
+        const res = await fetch('api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
+          },
+          body: JSON.stringify({
+            csrf_token: csrfToken,
+            website_hp: websiteHp,
+            name,
+            email,
+            project,
+            message
+          })
+        });
+        const data = await res.json();
+        if (feedback) {
+          feedback.style.display = 'block';
+          if (res.ok && data.ok) {
+            feedback.textContent = `🔒 CSRF VERIFIED — ${data.summary}`;
+          } else {
+            feedback.textContent = `⚠️ ${data.error || 'Validation check failed.'}`;
+            return;
+          }
+        }
+      } catch (_) {
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.textContent = `✓ TRANSMISSION PREPARED FOR JOHN PAUL TUANGCO (@Jaypee1031) — Scope: ${project}`;
+        }
       }
 
-      // Also open mailto or copy summary smoothly
       const subject = encodeURIComponent(`[JAYPEE STUDIO] ${project} — from ${name}`);
       const body = encodeURIComponent(`Hi John Paul (@Jaypee1031),\n\nName: ${name}\nEmail: ${email}\nScope: ${project}\n\nMessage:\n${message}`);
       window.location.href = `mailto:jptuangco1031@gmail.com?subject=${subject}&body=${body}`;
@@ -356,7 +429,7 @@
     initThemeEngine();
     init3DModeSwitcher();
     initSpatialInteractions();
-    initScrollSpy();
+    initCleanUrlNavigation();
     initContactForm();
     window.cyberSnakeGame = new CyberSnakeGame();
   });

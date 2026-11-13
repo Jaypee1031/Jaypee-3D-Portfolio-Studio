@@ -669,9 +669,9 @@
       let reposData = null;
       let sourceLabel = 'GITHUB REST API LIVE';
 
-      // Step 1: Try local XAMPP PHP proxy first (if running on Apache/PHP)
+      // Step 1: Try clean extensionless PHP endpoint (/api/github-sync)
       try {
-        const proxyResp = await fetch(`api/github-proxy.php?user=${encodeURIComponent(this.username)}${forceRefresh ? '&force=1' : ''}`, {
+        const proxyResp = await fetch(`api/github-sync?user=${encodeURIComponent(this.username)}${forceRefresh ? '&force=1' : ''}`, {
           cache: 'no-store'
         });
         if (proxyResp.ok) {

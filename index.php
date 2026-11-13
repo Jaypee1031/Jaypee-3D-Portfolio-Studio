@@ -1,15 +1,144 @@
+<?php
+declare(strict_types=1);
+
+/**
+ * JAYPEE STUDIO // Main PHP Front Controller & Extensionless Clean Router
+ * Author: John Paul Tuangco (@Jaypee1031)
+ * Security: CSP Nonce, CSRF Token, WAF Input Guard, Rate Limiting & Extensionless URLs
+ */
+
+// Allow PHP Built-in Web Server (php -S) to serve static CSS/JS assets cleanly
+if (PHP_SAPI === 'cli-server') {
+    $reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    $fullFile = __DIR__ . $reqPath;
+    if ($reqPath !== '/' && is_file($fullFile) && !preg_match('/\.(php|html?)$/i', $reqPath)) {
+        return false;
+    }
+}
+
+require_once __DIR__ . '/includes/security.php';
+
+// 1. Strip any .php or .html from the URL bar immediately via 301 redirect
+enforce_clean_extensionless_url();
+
+// 2. Run Web Application Firewall (WAF) check on incoming request
+run_waf_request_guard();
+
+// 3. Determine clean route path relative to project base directory
+$requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+$scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+$basePath = ($scriptDir === '/' || $scriptDir === '.') ? '' : rtrim($scriptDir, '/');
+
+$route = $requestUri;
+if ($basePath !== '' && strpos($requestUri, $basePath) === 0) {
+    $route = substr($requestUri, strlen($basePath));
+}
+$route = '/' . ltrim($route, '/');
+$routeKey = rtrim($route, '/') ?: '/';
+
+// ============================================================================
+// EXTENSIONLESS API ROUTES (/api/github-sync & /api/contact)
+// ============================================================================
+
+if ($routeKey === '/api/github-sync') {
+    if (!check_rate_limit('github_sync', 60, 60)) {
+        http_response_code(429);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['error' => 'Rate limit exceeded. Please wait a moment.']);
+        exit;
+    }
+    define('JAYPEE_INTERNAL_ROUTED', true);
+    require __DIR__ . '/api/github-proxy.php';
+    exit;
+}
+
+if ($routeKey === '/api/contact' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json; charset=utf-8');
+
+    if (!check_rate_limit('contact_form', 6, 60)) {
+        http_response_code(429);
+        echo json_encode(['ok' => false, 'error' => 'Too many transmissions. Please wait 60 seconds.']);
+        exit;
+    }
+
+    $rawInput = file_get_contents('php://input');
+    $payload = json_decode($rawInput ?: '{}', true);
+    if (!is_array($payload)) {
+        $payload = $_POST;
+    }
+
+    // Anti-Bot Honeypot Check
+    if (!empty($payload['website_hp'])) {
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'error' => 'Bot activity blocked.']);
+        exit;
+    }
+
+    // Verify Cryptographic CSRF Token
+    $submittedCsrf = (string)($payload['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''));
+    if (!verify_csrf_token($submittedCsrf)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'Invalid security CSRF token. Please refresh the page.']);
+        exit;
+    }
+
+    $senderName = clean_input((string)($payload['name'] ?? ''), 120);
+    $senderEmail = filter_var(trim((string)($payload['email'] ?? '')), FILTER_VALIDATE_EMAIL);
+    $projectScope = clean_input((string)($payload['project'] ?? ''), 160);
+    $messageBody = clean_input((string)($payload['message'] ?? ''), 2000);
+
+    if ($senderName === '' || !$senderEmail || $messageBody === '') {
+        http_response_code(422);
+        echo json_encode(['ok' => false, 'error' => 'Please provide a valid name, email, and project brief.']);
+        exit;
+    }
+
+    echo json_encode([
+        'ok' => true,
+        'timestamp' => gmdate('c'),
+        'recipient' => 'John Paul Tuangco (@Jaypee1031)',
+        'summary' => "Secured transmission verified for {$senderName} ({$projectScope})."
+    ]);
+    exit;
+}
+
+// ============================================================================
+// EXTENSIONLESS PAGE ROUTES (/, /home, /works, /creations, /about, /services, /contacts)
+// ============================================================================
+$validSections = [
+    '/' => 'home',
+    '/home' => 'home',
+    '/works' => 'works',
+    '/creations' => 'creations',
+    '/about' => 'about',
+    '/services' => 'services',
+    '/contacts' => 'contacts'
+];
+
+$initialSection = $validSections[strtolower($routeKey)] ?? 'home';
+
+// Generate per-request cryptographic CSP Nonce & CSRF Token
+$cspNonce = base64_encode(random_bytes(16));
+$csrfToken = get_csrf_token();
+send_security_headers($cspNonce);
+
+// Compute clean base href so assets resolve whether accessed at / or /works
+$baseHref = ($basePath === '' ? '/' : $basePath . '/');
+?>
 <!DOCTYPE html>
-<html lang="en" data-theme="noir">
+<html lang="en" data-theme="noir" data-initial-section="<?= htmlspecialchars($initialSection, ENT_QUOTES, 'UTF-8') ?>" data-base-path="<?= htmlspecialchars($baseHref, ENT_QUOTES, 'UTF-8') ?>">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JAYPEE STUDIO — John Paul Tuangco (@Jaypee1031) | 3D Full-Stack & Flutter Portfolio</title>
-  <meta name="description" content="Interactive 3D Portfolio & Live GitHub Studio of John Paul Tuangco (@Jaypee1031) — Full-Stack Developer, Flutter Architect & Creative Technologist." />
+  <base href="<?= htmlspecialchars($baseHref, ENT_QUOTES, 'UTF-8') ?>" />
+  <meta name="csrf-token" content="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>" />
+  <title>JAYPEE STUDIO — John Paul Tuangco (@Jaypee1031) | 3D Full-Stack &amp; Flutter Portfolio</title>
+  <meta name="description" content="Interactive 3D Portfolio &amp; Live GitHub Studio of John Paul Tuangco (@Jaypee1031) — Full-Stack Developer, Flutter Architect &amp; Creative Technologist." />
 
   <!-- Google Fonts: Ultra-Condensed Monumental Display (Teko, Six Caps, Anton) + Technical Sans & Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@300;400;500;600&family=Six+Caps&family=Space+Grotesk:wght@300;400;500;600;700&family=Teko:wght@600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=JetBrains+Mono:wght@300;400;500;600&amp;family=Six+Caps&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Teko:wght@600;700&amp;display=swap" rel="stylesheet" />
 
   <!-- Studio Stylesheet -->
   <link rel="stylesheet" href="css/style.css" />
@@ -26,7 +155,7 @@
   <div id="webgl-container" aria-hidden="true"></div>
   <div class="atmosphere-overlay" aria-hidden="true"></div>
 
-  <!-- Top Notched HUD Header Bar (1:1 Reference Geometry) -->
+  <!-- Top Notched HUD Header Bar (1:1 Reference Geometry + Clean Extensionless Routes) -->
   <header class="hud-header">
     <div class="hud-top-bar">
       <!-- Top-Left Coordinates & GitHub Live Sync Indicator -->
@@ -34,28 +163,31 @@
         <span><strong class="loc-city">ISABELA, PH</strong> &nbsp; 16° 40' 19.2000" N &nbsp; 121° 27' 25.2000" E</span>
         <a href="https://github.com/Jaypee1031" target="_blank" rel="noopener" class="gh-live-pill" title="Connected to GitHub @Jaypee1031">
           <span class="pulse-dot"></span>
-          <span id="gh-sync-status-text">GH://JAYPEE1031 • LIVE SYNC</span>
+          <span id="gh-sync-status-text">GH://JAYPEE1031 • 24 REPOS LIVE</span>
         </a>
       </div>
 
-      <!-- Top-Center Trapezoidal Notched Navigation Cradle -->
+      <!-- Top-Center Trapezoidal Notched Navigation Cradle (Clean Extensionless Links — No .php or .html) -->
       <nav class="hud-nav-cradle" aria-label="Primary Navigation">
         <div class="notch-top-line-left"></div>
         <div class="notch-wing-left"></div>
         <ul class="hud-nav-links">
-          <li><a href="#home" class="active">Home</a></li>
-          <li><a href="#works">Works</a></li>
-          <li><a href="#creations">Creations</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#services">Services</a></li>
-          <li><a href="#contacts">Contacts</a></li>
+          <li><a href="home" data-nav-section="home" class="active">Home</a></li>
+          <li><a href="works" data-nav-section="works">Works</a></li>
+          <li><a href="creations" data-nav-section="creations">Creations</a></li>
+          <li><a href="about" data-nav-section="about">About</a></li>
+          <li><a href="services" data-nav-section="services">Services</a></li>
+          <li><a href="contacts" data-nav-section="contacts">Contacts</a></li>
         </ul>
         <div class="notch-wing-right"></div>
         <div class="notch-top-line-right"></div>
       </nav>
 
-      <!-- Top-Right Live Local Time Readout -->
+      <!-- Top-Right Live Local Time Readout & Security Shield Badge -->
       <div class="hud-telemetry-right">
+        <span class="gh-live-pill" title="CSP Nonce + CSRF Token + WAF Shield + Extensionless Routing Active">
+          🛡️ SECURED
+        </span>
         <span id="hud-live-clock">Local time: 14:45:00 (2:45 PM)</span>
       </div>
     </div>
@@ -65,13 +197,13 @@
   <aside class="studio-control-dock" aria-label="Theme and 3D Scene Controls">
     <div class="dock-group">
       <span class="dock-label">THEME (<span id="active-theme-label">NOIR B&amp;W</span>):</span>
-      <button type="button" class="theme-swatch active" data-set-theme="noir" title="Noir Monochrome (Black & White Reference)"></button>
-      <button type="button" class="theme-swatch" data-set-theme="crimson" title="Cyber Crimson (Black & White + Electric Red)"></button>
-      <button type="button" class="theme-swatch" data-set-theme="acid" title="Acid Volt (Black & White + Cyber Lime)"></button>
-      <button type="button" class="theme-swatch" data-set-theme="cobalt" title="Quantum Cobalt (Black & White + Cyan)"></button>
-      <button type="button" class="theme-swatch" data-set-theme="gold" title="Solar Gold (Black & White + Liquid Gold)"></button>
+      <button type="button" class="theme-swatch active" data-set-theme="noir" title="Noir Monochrome (Black &amp; White Reference)"></button>
+      <button type="button" class="theme-swatch" data-set-theme="crimson" title="Cyber Crimson (Black &amp; White + Electric Red)"></button>
+      <button type="button" class="theme-swatch" data-set-theme="acid" title="Acid Volt (Black &amp; White + Cyber Lime)"></button>
+      <button type="button" class="theme-swatch" data-set-theme="cobalt" title="Quantum Cobalt (Black &amp; White + Cyan)"></button>
+      <button type="button" class="theme-swatch" data-set-theme="gold" title="Solar Gold (Black &amp; White + Liquid Gold)"></button>
       <button type="button" class="theme-swatch" data-set-theme="prism" title="Cyber Prism (Magenta + Cyan Synth)"></button>
-      <button type="button" class="theme-swatch" data-set-theme="ivory" title="Stark Ivory (Daylight White & Black)"></button>
+      <button type="button" class="theme-swatch" data-set-theme="ivory" title="Stark Ivory (Daylight White &amp; Black)"></button>
     </div>
     <div class="dock-divider"></div>
     <div class="dock-group">
@@ -91,7 +223,6 @@
            SECTION 01 // HERO ("JAYPEE STUDIO" — EXACT REFERENCE ARCHITECTURE)
            ==================================================================== -->
       <section id="home" class="hero-section">
-        <!-- Top Monumental Ultra-Condensed Block Typography (Sits at z-index: 1 behind the 3D Bust) -->
         <div>
           <div class="hero-monument-wrap">
             <svg class="hero-monument-svg" viewBox="0 0 1600 400" preserveAspectRatio="none" role="img" aria-label="JAYPEE STUDIO">
@@ -106,7 +237,6 @@
             </svg>
           </div>
 
-          <!-- Left "since 2024 •" & Right Staggered "CREATING MEMORABLE DIGITAL EXPERIENCES" -->
           <div class="hero-title-meta-row">
             <div class="hero-since-block">
               <div>since</div>
@@ -146,7 +276,7 @@
           </div>
 
           <div class="orb-cta-wrap">
-            <a href="#contacts" id="hero-orb-cta" class="orb-cta-btn">
+            <a href="contacts" data-nav-section="contacts" id="hero-orb-cta" class="orb-cta-btn">
               <span>CONTACT</span>
               <span class="orb-cta-sub">INITIATE ↗</span>
             </a>
@@ -170,38 +300,38 @@
               <h2 class="section-title">SELECTED WORKS &amp; SYSTEMS</h2>
             </div>
             <p class="section-desc">
-              Production full-stack platforms, cross-platform Flutter mobile &amp; desktop ecosystems, municipal analytics portals, and interactive web experiments engineered by <strong>John Paul Tuangco (@Jaypee1031)</strong>.
+              Production full-stack platforms, cross-platform Flutter mobile &amp; desktop ecosystems, municipal analytics portals, and interactive 3D/CV experiments engineered by <strong>John Paul Tuangco (@Jaypee1031)</strong>.
             </p>
           </div>
 
           <!-- Live GitHub Telemetry Counters -->
           <div class="telemetry-strip">
             <div class="telemetry-card">
-              <div class="telemetry-value" id="stat-repo-count">15<span>+</span></div>
+              <div class="telemetry-value" id="stat-repo-count">24<span>+</span></div>
               <div class="telemetry-label">Public GitHub Repositories</div>
               <div class="telemetry-sub" id="stat-sync-source">Connected to github.com/Jaypee1031</div>
             </div>
             <div class="telemetry-card">
-              <div class="telemetry-value" id="stat-total-volume">186.6<span>MB</span></div>
+              <div class="telemetry-value" id="stat-total-volume">281.4<span>MB</span></div>
               <div class="telemetry-label">Total Codebase Footprint</div>
               <div class="telemetry-sub" id="stat-latest-push">Auto-synced with latest commits</div>
             </div>
             <div class="telemetry-card">
-              <div class="telemetry-value">4<span>×</span></div>
+              <div class="telemetry-value">5<span>×</span></div>
               <div class="telemetry-label">Core Engineering Domains</div>
-              <div class="telemetry-sub">Flutter • Full-Stack Web • Enterprise PHP • 3D/Canvas</div>
+              <div class="telemetry-sub">Flutter • Full-Stack MVC • Three.js 3D • CV • Civic Tech</div>
             </div>
             <div class="telemetry-card">
-              <div class="telemetry-value">LIVE<span>•</span></div>
-              <div class="telemetry-label">Auto-Update Engine</div>
-              <div class="telemetry-sub">New GitHub repos render automatically</div>
+              <div class="telemetry-value">SEC<span>✓</span></div>
+              <div class="telemetry-label">Hardened PHP Architecture</div>
+              <div class="telemetry-sub">CSP Nonce • CSRF • WAF • Extensionless Routing</div>
             </div>
           </div>
 
           <!-- Flagship Featured Creations Grid -->
           <div class="featured-grid">
 
-            <!-- 1. FLAGSHIP: GuideSched (Flutter + PHP + MySQL Ecosystem) -->
+            <!-- 1. FLAGSHIP: GuideSched & Appointment in Guidance Ecosystem -->
             <article class="creation-card flagship">
               <div>
                 <div class="creation-top-meta">
@@ -209,15 +339,15 @@
                   <span class="creation-badge">FLUTTER 3.47 + PHP 8 API</span>
                 </div>
                 <h3 class="creation-title">GUIDESCHED — COUNSELING &amp; SCHEDULING SYSTEM</h3>
-                <div class="creation-subtitle">github.com/Jaypee1031/guidesched &amp; /guideschedapp</div>
+                <div class="creation-subtitle">Appointment-in-Guidance • GuideSched-App • Appointment-in-Guidance-App</div>
                 <p class="creation-desc">
-                  A comprehensive guidance counseling appointment and scheduling platform engineered for <strong>Cagasat High School</strong>. Built with a unified <strong>2-User Role System (Student &amp; Guidance Counselor)</strong> across both a full-featured <strong>PHP 8 Web Portal</strong> and a cross-platform <strong>Flutter 3.47 / Dart 3.13 Mobile &amp; Desktop Application</strong>.
+                  A comprehensive guidance counseling appointment and scheduling platform engineered for <strong>Cagasat High School</strong>. Built with a unified multi-role architecture (<strong>Student, Guidance Counselor &amp; Principal</strong>) across a full-featured <strong>PHP 8 Web Portal</strong> and a cross-platform <strong>Flutter 3.47 / Dart 3.13 Mobile &amp; Desktop Application</strong>.
                 </p>
                 <ul class="creation-highlights">
-                  <li>Cross-Platform Flutter Mobile &amp; Desktop App</li>
-                  <li>RESTful `/api/` Backend with PHP 8 &amp; MySQL/MariaDB</li>
-                  <li>Student Appointment Booking &amp; Live Status Tracking</li>
-                  <li>Counselor Case Management, Schedules &amp; Analytics</li>
+                  <li>Cross-Platform Flutter Mobile, Desktop &amp; Web App</li>
+                  <li>RESTful `/api/v2/` Backend with Smart Concern Suggestion</li>
+                  <li>Student, Counselor &amp; Principal Multi-Role Dashboards</li>
+                  <li>Real-Time Urgent Notifications, Handover &amp; Analytics</li>
                 </ul>
                 <div class="tech-stack-row">
                   <span class="tech-pill">Flutter 3.47.2</span>
@@ -225,7 +355,6 @@
                   <span class="tech-pill">PHP 8.x REST API</span>
                   <span class="tech-pill">MySQL / MariaDB</span>
                   <span class="tech-pill">JavaScript</span>
-                  <span class="tech-pill">C++ Desktop Runner</span>
                 </div>
                 <div class="creation-actions">
                   <a href="https://github.com/Jaypee1031/Appointment-in-Guidance" target="_blank" rel="noopener" class="btn-hud primary">APPOINTMENT IN GUIDANCE V2 ↗</a>
@@ -235,7 +364,6 @@
                 </div>
               </div>
 
-              <!-- Interactive Visual Architecture Blueprint -->
               <div class="creation-visual-preview">
                 <div class="arch-terminal-header">
                   <span>SYS_ARCH // GUIDESCHED_V3.47</span>
@@ -248,7 +376,7 @@
                   </div>
                   <div class="arch-node" style="border-color:var(--accent-primary);">
                     <strong>PHP 8 REST API</strong>
-                    <span>Unified /api/ • Auth &amp; Sync</span>
+                    <span>Unified /api/v2 • Auth &amp; Sync</span>
                   </div>
                   <div class="arch-node">
                     <strong>MYSQL / MARIADB</strong>
@@ -256,14 +384,14 @@
                   </div>
                 </div>
                 <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.6;color:rgba(255,255,255,0.72);background:rgba(255,255,255,0.03);padding:14px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
-                  <div>&gt; ROLES: [Student Portal] ⇄ [Guidance Counselor Admin]</div>
+                  <div>&gt; ROLES: [Student] ⇄ [Counselor] ⇄ [Principal]</div>
                   <div>&gt; DESIGN: Emerald &amp; Forest Green Calming UI System</div>
                   <div>&gt; DEPLOYMENT: Cagasat High School Guidance Office</div>
                 </div>
               </div>
             </article>
 
-            <!-- 2. Smart Brew & Car Wash (React 18 + Tailwind + PHP + JWT) -->
+            <!-- 2. Smart Brew & Car Wash -->
             <article class="creation-card">
               <div>
                 <div class="creation-top-meta">
@@ -296,30 +424,30 @@
               </div>
             </article>
 
-            <!-- 3. University Admission Portal (PHP + MySQL + Automated PDF) -->
+            <!-- 3. University Admission Portal V2 & V1 -->
             <article class="creation-card">
               <div>
                 <div class="creation-top-meta">
                   <span>03 // HIGHER-EDUCATION ENTERPRISE PORTAL</span>
-                  <span class="creation-badge">PHP + MYSQL + F1-A PDF</span>
+                  <span class="creation-badge">PHP MVC + OMR + F1-A/F2 PDF</span>
                 </div>
-                <h3 class="creation-title">UNIVERSITY ADMISSION PORTAL</h3>
-                <div class="creation-subtitle">github.com/Jaypee1031/admission-portal</div>
+                <h3 class="creation-title">QSU UNIVERSITY ADMISSION PORTAL V2</h3>
+                <div class="creation-subtitle">Admission-Portal-V2-Update &amp; admission-portal</div>
                 <p class="creation-desc">
-                  End-to-end university admission and applicant management portal allowing Freshman and Transferee students to register, upload credentials, fill out pre-admission forms, schedule entrance exam test permits, and automatically generate official <strong>F1-A format PDFs</strong>.
+                  End-to-end university admission and applicant management system for <strong>Quirino State University (QSU)</strong> allowing Freshman and Transferee students to register, upload credentials, complete assessment questionnaires, schedule exam permits, and generate official <strong>F1-A/F2 format PDFs</strong>.
                 </p>
                 <ul class="creation-highlights">
-                  <li>Automated Official F1-A PDF Form Generation</li>
-                  <li>Freshman vs. Transferee Document Workflows</li>
-                  <li>Entrance Exam Test Permit Scheduling</li>
-                  <li>Admin Document Verification &amp; Charts</li>
+                  <li>Automated Official F1-A &amp; F2 PDF Claim Stubs</li>
+                  <li>OMR Exam Scanner &amp; Test Result Analytics</li>
+                  <li>AI Assistant Chat Widget &amp; Path Obfuscation Security</li>
+                  <li>Admin Document Verification &amp; Slot Scheduling</li>
                 </ul>
                 <div class="tech-stack-row">
-                  <span class="tech-pill">PHP 8</span>
+                  <span class="tech-pill">PHP 8 MVC</span>
                   <span class="tech-pill">MySQL</span>
-                  <span class="tech-pill">Bootstrap</span>
-                  <span class="tech-pill">PDF Generator</span>
-                  <span class="tech-pill">JavaScript</span>
+                  <span class="tech-pill">TCPDF</span>
+                  <span class="tech-pill">OMR Scanner</span>
+                  <span class="tech-pill">AI Chat Widget</span>
                 </div>
               </div>
               <div class="creation-actions">
@@ -408,7 +536,7 @@
                   <li>Custom PHP 8 MVC Scholarship Router &amp; TCPDF Engine</li>
                   <li>OSAS Walk-In Touch Kiosk, Audit Logs &amp; CSV Export</li>
                   <li>Three.js r187 + esbuild 3D Student Council Hub &amp; CMS</li>
-                  <li>Admission Portal V2 Update with OMR &amp; AI Chat Widget</li>
+                  <li>Multi-Campus Support (Diffun • Cabarroguis • Maddela)</li>
                 </ul>
                 <div class="tech-stack-row">
                   <span class="tech-pill">PHP 8 MVC</span>
@@ -469,11 +597,10 @@
               <h2 class="section-title">LIVE GITHUB REPOSITORIES</h2>
             </div>
             <p class="section-desc">
-              Directly wired to <strong><a href="https://github.com/Jaypee1031" target="_blank" rel="noopener" style="color:var(--accent-primary);">github.com/Jaypee1031</a></strong>. Whenever a new repository is created or updated on GitHub, this matrix automatically fetches, classifies, and renders it in real time.
+              Directly wired to <strong><a href="https://github.com/Jaypee1031" target="_blank" rel="noopener" style="color:var(--accent-primary);">github.com/Jaypee1031</a></strong> via our extensionless <code>/api/github-sync</code> endpoint. New repositories pushed to GitHub automatically appear here.
             </p>
           </div>
 
-          <!-- Language Distribution Bar -->
           <div class="lang-distribution-box">
             <div style="display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;">
               <span>MULTI-REPOSITORY LANGUAGE &amp; ARCHITECTURE TELEMETRY</span>
@@ -483,7 +610,6 @@
             <div id="lang-legend" class="lang-legend"></div>
           </div>
 
-          <!-- Filter Tabs, Live Search & Force Sync Controls -->
           <div class="gh-control-bar">
             <div class="gh-filter-tabs">
               <button type="button" class="gh-filter-btn active" data-gh-filter="all">ALL REPOS</button>
@@ -507,7 +633,6 @@
             </div>
           </div>
 
-          <!-- Auto-Populated GitHub Repository Grid -->
           <div id="repo-auto-grid" class="repo-auto-grid"></div>
         </section>
 
@@ -523,12 +648,11 @@
               <h2 class="section-title">ABOUT JOHN PAUL TUANGCO</h2>
             </div>
             <p class="section-desc">
-              Full-Stack Developer, Flutter Cross-Platform Engineer &amp; Creative Technologist building production systems for institutions, municipalities, and modern businesses.
+              Full-Stack Developer, Flutter Cross-Platform Engineer &amp; Creative Technologist building production systems for institutions, universities, municipalities, and modern businesses.
             </p>
           </div>
 
           <div class="about-grid">
-            <!-- Left: Architect Profile Card -->
             <div class="architect-dossier">
               <div class="dossier-header">
                 <img
@@ -544,10 +668,10 @@
               </div>
 
               <p class="dossier-bio">
-                Based in <strong>Cordon, Isabela, Philippines</strong>, I design and engineer complete digital ecosystems—from cross-platform <strong>Flutter &amp; Dart</strong> mobile/desktop applications and <strong>React 18</strong> web frontends to hardened <strong>PHP 8 &amp; MySQL</strong> enterprise backends.
+                Based in <strong>Cordon, Isabela, Philippines</strong>, I design and engineer complete digital ecosystems—from cross-platform <strong>Flutter &amp; Dart</strong> mobile/desktop applications and <strong>Three.js / React 18</strong> web frontends to hardened <strong>PHP 8 MVC &amp; MySQL</strong> enterprise backends.
               </p>
               <p class="dossier-bio" style="margin-bottom:28px;">
-                My work spans real-world deployments including high-school guidance counseling platforms (<em>GuideSched</em>), municipal emergency dispatch &amp; barangay analytics systems (<em>Cordon Rescue</em>), university admission portals with automated PDF engines, commercial POS systems (<em>Smart Brew &amp; Car Wash</em>), and interactive 3D/Canvas web experiences.
+                My portfolio spans <strong>24+ public repositories</strong> including Quirino State University (QSU) admission, scholarship &amp; OSAS kiosk systems, Cagasat High School guidance counseling platforms (<em>GuideSched</em>), Cordon municipal emergency analytics, real-time webcam hand-tracking 3D HUDs (<em>HOLO HAND v3.0</em>), and commercial management portals.
               </p>
 
               <div class="dossier-kv-grid">
@@ -561,16 +685,15 @@
                 </div>
                 <div class="kv-item">
                   <span>PRIMARY FOCUS</span>
-                  <strong>Full-Stack, Flutter &amp; 3D Web</strong>
+                  <strong>Full-Stack MVC, Flutter &amp; 3D Web</strong>
                 </div>
                 <div class="kv-item">
-                  <span>AVAILABILITY</span>
-                  <strong style="color:var(--accent-primary);">Open for Projects &amp; Collabs</strong>
+                  <span>SECURITY ARCHITECTURE</span>
+                  <strong style="color:var(--accent-primary);">CSP • CSRF • WAF • Clean URLs</strong>
                 </div>
               </div>
             </div>
 
-            <!-- Right: 4-Domain Technical Capability Matrix -->
             <div class="skills-matrix-grid">
               <div class="skill-domain-card">
                 <div class="skill-domain-title">
@@ -579,15 +702,15 @@
                 </div>
                 <div class="skill-bar-list">
                   <div class="skill-bar-item">
-                    <div class="skill-bar-top"><span>Flutter 3.x (Mobile/Desktop)</span><span>95%</span></div>
+                    <div class="skill-bar-top"><span>Flutter 3.x (Mobile/Desktop/Web)</span><span>95%</span></div>
                     <div class="skill-bar-rail"><div class="skill-bar-fill" style="width:95%"></div></div>
                   </div>
                   <div class="skill-bar-item">
-                    <div class="skill-bar-top"><span>Dart 3 &amp; State Architecture</span><span>92%</span></div>
+                    <div class="skill-bar-top"><span>Dart 3 &amp; Multi-Role State</span><span>92%</span></div>
                     <div class="skill-bar-rail"><div class="skill-bar-fill" style="width:92%"></div></div>
                   </div>
                   <div class="skill-bar-item">
-                    <div class="skill-bar-top"><span>REST API Client Sync</span><span>94%</span></div>
+                    <div class="skill-bar-top"><span>REST API v2 Client Sync</span><span>94%</span></div>
                     <div class="skill-bar-rail"><div class="skill-bar-fill" style="width:94%"></div></div>
                   </div>
                 </div>
@@ -604,8 +727,8 @@
                     <div class="skill-bar-rail"><div class="skill-bar-fill" style="width:94%"></div></div>
                   </div>
                   <div class="skill-bar-item">
-                    <div class="skill-bar-top"><span>Three.js / WebGL &amp; Canvas</span><span>88%</span></div>
-                    <div class="skill-bar-rail"><div class="skill-bar-fill" style="width:88%"></div></div>
+                    <div class="skill-bar-top"><span>Three.js / WebGL &amp; Hand-Tracking CV</span><span>90%</span></div>
+                    <div class="skill-bar-rail"><div class="skill-bar-fill" style="width:90%"></div></div>
                   </div>
                   <div class="skill-bar-item">
                     <div class="skill-bar-top"><span>TailwindCSS / Bootstrap / CSS3</span><span>96%</span></div>
@@ -621,15 +744,15 @@
                 </div>
                 <div class="skill-bar-list">
                   <div class="skill-bar-item">
-                    <div class="skill-bar-top"><span>PHP 8+ &amp; RESTful APIs</span><span>96%</span></div>
+                    <div class="skill-bar-top"><span>PHP 8+ MVC &amp; Clean Routing</span><span>96%</span></div>
                     <div class="skill-bar-rail"><div class="skill-bar-fill" style="width:96%"></div></div>
                   </div>
                   <div class="skill-bar-item">
-                    <div class="skill-bar-top"><span>JWT Auth, OTP &amp; bcrypt</span><span>92%</span></div>
-                    <div class="skill-bar-rail"><div class="skill-bar-fill" style="width:92%"></div></div>
+                    <div class="skill-bar-top"><span>JWT, CSRF, CSP, OTP &amp; bcrypt</span><span>94%</span></div>
+                    <div class="skill-bar-rail"><div class="skill-bar-fill" style="width:94%"></div></div>
                   </div>
                   <div class="skill-bar-item">
-                    <div class="skill-bar-top"><span>Automated PDF &amp; Report Engines</span><span>95%</span></div>
+                    <div class="skill-bar-top"><span>TCPDF / F1-A Automated PDFs</span><span>95%</span></div>
                     <div class="skill-bar-rail"><div class="skill-bar-fill" style="width:95%"></div></div>
                   </div>
                 </div>
@@ -642,15 +765,15 @@
                 </div>
                 <div class="skill-bar-list">
                   <div class="skill-bar-item">
-                    <div class="skill-bar-top"><span>MySQL / MariaDB Schema Design</span><span>95%</span></div>
+                    <div class="skill-bar-top"><span>MySQL / MariaDB / PDO</span><span>95%</span></div>
                     <div class="skill-bar-rail"><div class="skill-bar-fill" style="width:95%"></div></div>
                   </div>
                   <div class="skill-bar-item">
-                    <div class="skill-bar-top"><span>Chart.js &amp; Executive Dashboards</span><span>93%</span></div>
+                    <div class="skill-bar-top"><span>Chart.js, OMR &amp; Audit Trails</span><span>93%</span></div>
                     <div class="skill-bar-rail"><div class="skill-bar-fill" style="width:93%"></div></div>
                   </div>
                   <div class="skill-bar-item">
-                    <div class="skill-bar-top"><span>Git, GitHub &amp; XAMPP Stack</span><span>94%</span></div>
+                    <div class="skill-bar-top"><span>Git, GitHub API &amp; esbuild</span><span>94%</span></div>
                     <div class="skill-bar-rail"><div class="skill-bar-fill" style="width:94%"></div></div>
                   </div>
                 </div>
@@ -671,24 +794,24 @@
               <h2 class="section-title">WHAT I ARCHITECT &amp; BUILD</h2>
             </div>
             <p class="section-desc">
-              End-to-end software engineering from database modeling and REST APIs to cross-platform mobile apps and high-impact 3D web interfaces.
+              End-to-end software engineering from hardened PHP MVC backends and MySQL schemas to cross-platform Flutter apps and 3D WebGL interfaces.
             </p>
           </div>
 
           <div class="services-grid">
             <div class="service-card">
               <div>
-                <div class="service-num">01 // ENTERPRISE &amp; COMMERCIAL WEB</div>
-                <h3 class="service-title">FULL-STACK PORTALS &amp; MANAGEMENT SYSTEMS</h3>
+                <div class="service-num">01 // ENTERPRISE &amp; UNIVERSITY PORTALS</div>
+                <h3 class="service-title">FULL-STACK MVC &amp; MANAGEMENT SYSTEMS</h3>
                 <p class="creation-desc">
-                  Custom admission portals, municipal incident &amp; analytics dashboards, attendance systems, and commercial POS/ordering platforms engineered with React, PHP 8, MySQL, JWT auth, and automated PDF reporting.
+                  Custom university admission &amp; scholarship portals, OSAS kiosks, municipal incident analytics dashboards, and commercial POS platforms engineered with React, PHP 8 MVC, MySQL, and automated PDF engines.
                 </p>
               </div>
               <div class="tech-stack-row" style="margin-bottom:0;">
+                <span class="tech-pill">PHP 8 MVC</span>
                 <span class="tech-pill">React 18</span>
-                <span class="tech-pill">PHP 8</span>
                 <span class="tech-pill">MySQL</span>
-                <span class="tech-pill">JWT / OTP</span>
+                <span class="tech-pill">CSRF / JWT</span>
               </div>
             </div>
 
@@ -697,7 +820,7 @@
                 <div class="service-num">02 // CROSS-PLATFORM APPS</div>
                 <h3 class="service-title">FLUTTER MOBILE &amp; DESKTOP ECOSYSTEMS</h3>
                 <p class="creation-desc">
-                  Native-performance Android, iOS, and Windows Desktop applications powered by Flutter &amp; Dart, seamlessly synchronized with cloud REST APIs, role-based portals, and real-time scheduling databases.
+                  Native-performance Android, iOS, Windows Desktop, and Web applications powered by Flutter &amp; Dart, seamlessly synchronized with REST APIs, multi-role portals, and real-time scheduling databases.
                 </p>
               </div>
               <div class="tech-stack-row" style="margin-bottom:0;">
@@ -711,15 +834,15 @@
             <div class="service-card">
               <div>
                 <div class="service-num">03 // IMMERSIVE FRONTENDS</div>
-                <h3 class="service-title">3D WEBGL, UI/UX &amp; CREATIVE EXPERIENCES</h3>
+                <h3 class="service-title">3D WEBGL, COMPUTER VISION &amp; UI/UX</h3>
                 <p class="creation-desc">
-                  High-contrast cyber-brutalist studio websites, interactive Three.js 3D product/brand showcases, HTML5 Canvas games, and responsive design systems that leave a lasting visual impression.
+                  High-contrast cyber-brutalist studio websites, interactive Three.js 3D showcases, webcam hand-tracking holographic interfaces, and HTML5 Canvas games.
                 </p>
               </div>
               <div class="tech-stack-row" style="margin-bottom:0;">
                 <span class="tech-pill">Three.js / WebGL</span>
+                <span class="tech-pill">Hand-Tracking CV</span>
                 <span class="tech-pill">HTML5 Canvas</span>
-                <span class="tech-pill">TailwindCSS</span>
                 <span class="tech-pill">UI/UX</span>
               </div>
             </div>
@@ -729,7 +852,7 @@
         <div class="section-divider"></div>
 
         <!-- ==================================================================
-             SECTION 06 // INTERACTIVE CONTACT TERMINAL
+             SECTION 06 // INTERACTIVE CONTACT TERMINAL (CSRF + HONEYPOT SECURED)
              ================================================================== -->
         <section id="contacts" class="studio-section">
           <div class="section-header">
@@ -748,13 +871,13 @@
                 DIRECT CHANNELS // JAYPEE STUDIO
               </h3>
               <p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.6;">
-                All repositories and open-source creations are live on GitHub. Reach out via GitHub, Facebook, or direct dispatch below.
+                All 24+ repositories and open-source creations are live on GitHub. Reach out via GitHub, Facebook, or direct CSRF-protected transmission.
               </p>
 
               <div class="contact-channels">
                 <a href="https://github.com/Jaypee1031" target="_blank" rel="noopener" class="channel-row">
                   <div>
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text-muted);">GITHUB PROFILE &amp; REPOSITORIES</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text-muted);">GITHUB PROFILE &amp; 24+ REPOSITORIES</div>
                     <strong style="font-size:1.02rem;">github.com/Jaypee1031</strong>
                   </div>
                   <span style="color:var(--accent-primary);font-family:'JetBrains Mono',monospace;">OPEN ↗</span>
@@ -770,34 +893,41 @@
 
                 <div class="channel-row">
                   <div>
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text-muted);">BASE COORDINATES</div>
-                    <strong style="font-size:1.02rem;">Cordon, Isabela, Philippines (16°40'N, 121°27'E)</strong>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text-muted);">SECURITY &amp; ROUTING STATUS</div>
+                    <strong style="font-size:1.02rem;">Extensionless Clean URLs • CSP + CSRF Shield</strong>
                   </div>
-                  <span style="color:var(--status-online);font-family:'JetBrains Mono',monospace;">● ACTIVE</span>
+                  <span style="color:var(--status-online);font-family:'JetBrains Mono',monospace;">● PROTECTED</span>
                 </div>
               </div>
             </div>
 
             <div class="contact-panel">
-              <form id="studio-contact-form" class="contact-form">
+              <form id="studio-contact-form" class="contact-form" autocomplete="on">
+                <input type="hidden" id="cf-csrf-token" name="csrf_token" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>" />
+                <!-- Anti-Bot Honeypot Field (Hidden from real users) -->
+                <div style="position:absolute;left:-9999px;opacity:0;pointer-events:none;" aria-hidden="true">
+                  <label for="cf-website-hp">Leave this field blank</label>
+                  <input type="text" id="cf-website-hp" name="website_hp" tabindex="-1" autocomplete="off" />
+                </div>
+
                 <div class="form-group">
                   <label for="cf-name">YOUR NAME / ORGANIZATION</label>
-                  <input type="text" id="cf-name" class="form-control" placeholder="e.g. Alex Rivera / Studio Client" required />
+                  <input type="text" id="cf-name" name="name" class="form-control" placeholder="e.g. Alex Rivera / Studio Client" maxlength="120" required />
                 </div>
                 <div class="form-group">
                   <label for="cf-email">YOUR EMAIL OR CONTACT HANDLE</label>
-                  <input type="email" id="cf-email" class="form-control" placeholder="you@domain.com" required />
+                  <input type="email" id="cf-email" name="email" class="form-control" placeholder="you@domain.com" maxlength="160" required />
                 </div>
                 <div class="form-group">
                   <label for="cf-project">PROJECT ARCHITECTURE / SCOPE</label>
-                  <input type="text" id="cf-project" class="form-control" placeholder="Full-Stack System / Flutter App / 3D Website" required />
+                  <input type="text" id="cf-project" name="project" class="form-control" placeholder="Full-Stack System / Flutter App / 3D Website" maxlength="160" required />
                 </div>
                 <div class="form-group">
                   <label for="cf-message">TRANSMISSION BRIEF</label>
-                  <textarea id="cf-message" rows="4" class="form-control" placeholder="Tell me about your project goals, timeline, and system requirements..." required></textarea>
+                  <textarea id="cf-message" name="message" rows="4" class="form-control" placeholder="Tell me about your project goals, timeline, and system requirements..." maxlength="2000" required></textarea>
                 </div>
                 <button type="submit" class="btn-hud primary" style="justify-content:center;padding:14px;">
-                  SEND TRANSMISSION TO JAYPEE STUDIO ↗
+                  🔒 SEND SECURED TRANSMISSION TO JAYPEE STUDIO ↗
                 </button>
                 <div id="contact-form-feedback" style="display:none;margin-top:8px;padding:12px;border:1px solid var(--accent-primary);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:0.74rem;color:var(--text-primary);"></div>
               </form>
@@ -808,7 +938,7 @@
         <!-- Studio Footer -->
         <footer class="studio-footer">
           <div>© 2024–2026 JAYPEE STUDIO // JOHN PAUL TUANGCO (@Jaypee1031). ALL RIGHTS RESERVED.</div>
-          <div>AUTO-SYNCED WITH GITHUB REST API • PRESS [T] TO SWITCH COLOR THEMES</div>
+          <div>🛡️ SECURED PHP ROUTER (ZERO .PHP/.HTML IN URL) • AUTO-SYNCED WITH GITHUB API</div>
         </footer>
       </div>
 
@@ -851,10 +981,10 @@
     </div>
   </div>
 
-  <!-- Three.js WebGL Library + Studio Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="js/scene3d.js"></script>
-  <script src="js/github-sync.js"></script>
-  <script src="js/app.js"></script>
+  <!-- Three.js WebGL Library + CSP Nonce-Secured Studio Scripts -->
+  <script nonce="<?= htmlspecialchars($cspNonce, ENT_QUOTES, 'UTF-8') ?>" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script nonce="<?= htmlspecialchars($cspNonce, ENT_QUOTES, 'UTF-8') ?>" src="js/scene3d.js"></script>
+  <script nonce="<?= htmlspecialchars($cspNonce, ENT_QUOTES, 'UTF-8') ?>" src="js/github-sync.js"></script>
+  <script nonce="<?= htmlspecialchars($cspNonce, ENT_QUOTES, 'UTF-8') ?>" src="js/app.js"></script>
 </body>
 </html>
