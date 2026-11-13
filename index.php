@@ -348,6 +348,57 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
             </div>
           </div>
 
+          <!-- Real-Time Visitor Multi-Horizon Breakdown Bar (Week / Month / Year / All-Time) -->
+          <div class="lang-distribution-box" style="margin-bottom:48px;">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
+              <div style="display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:0.75rem;">
+                <span class="pulse-dot"></span>
+                <span>REAL-TIME VISITOR TELEMETRY // TODAY • THIS WEEK • THIS MONTH • THIS YEAR • ALL-TIME</span>
+              </div>
+              <button type="button" class="btn-hud" data-open-visitors="true" style="padding:6px 14px;font-size:0.68rem;">
+                📊 OPEN LIVE VISITOR ANALYTICS &amp; CHARTS
+              </button>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;">
+              <div style="padding:14px 16px;border:1px solid var(--border-subtle);border-radius:10px;background:rgba(255,255,255,0.02);">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--text-muted);">● ONLINE NOW</div>
+                <div id="vbar-online" style="font-family:'Teko',sans-serif;font-size:2.3rem;line-height:1;color:var(--status-online);margin-top:4px;">1</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text-secondary);">Active Sessions (45s)</div>
+              </div>
+
+              <div style="padding:14px 16px;border:1px solid var(--border-subtle);border-radius:10px;background:rgba(255,255,255,0.02);">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--text-muted);">TODAY'S VISITORS</div>
+                <div id="vbar-today" style="font-family:'Teko',sans-serif;font-size:2.3rem;line-height:1;color:var(--text-primary);margin-top:4px;">1</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text-secondary);">24-Hour Count</div>
+              </div>
+
+              <div style="padding:14px 16px;border:1px solid var(--border-subtle);border-radius:10px;background:rgba(255,255,255,0.02);">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--text-muted);">THIS WEEK</div>
+                <div id="vbar-week" style="font-family:'Teko',sans-serif;font-size:2.3rem;line-height:1;color:var(--accent-primary);margin-top:4px;">1</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text-secondary);">7-Day Rolling Total</div>
+              </div>
+
+              <div style="padding:14px 16px;border:1px solid var(--border-subtle);border-radius:10px;background:rgba(255,255,255,0.02);">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--text-muted);">THIS MONTH</div>
+                <div id="vbar-month" style="font-family:'Teko',sans-serif;font-size:2.3rem;line-height:1;color:var(--text-primary);margin-top:4px;">1</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text-secondary);">Monthly Visitors</div>
+              </div>
+
+              <div style="padding:14px 16px;border:1px solid var(--border-subtle);border-radius:10px;background:rgba(255,255,255,0.02);">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--text-muted);">THIS YEAR</div>
+                <div id="vbar-year" style="font-family:'Teko',sans-serif;font-size:2.3rem;line-height:1;color:var(--accent-primary);margin-top:4px;">1</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text-secondary);">Annual Visitors</div>
+              </div>
+
+              <div style="padding:14px 16px;border:1px solid var(--border-subtle);border-radius:10px;background:rgba(255,255,255,0.02);">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--text-muted);">ALL-TIME TOTAL</div>
+                <div id="vbar-total" style="font-family:'Teko',sans-serif;font-size:2.3rem;line-height:1;color:var(--text-primary);margin-top:4px;">43</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text-secondary);">Cumulative Visits</div>
+              </div>
+            </div>
+          </div>
+
           <!-- Flagship Featured Creations Grid -->
           <div class="featured-grid">
 
@@ -1073,41 +1124,64 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
   </div>
 
   <!-- ======================================================================
-       MODAL 04 // REAL-TIME VISITOR TELEMETRY & LIVE SESSION RADAR
+       MODAL 04 // REAL-TIME VISITOR TELEMETRY & MULTI-HORIZON ANALYTICS
        ====================================================================== -->
   <div id="visitors-modal-backdrop" class="hud-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="visitors-modal-title">
-    <div class="hud-modal" style="width:min(760px, 96vw);">
+    <div class="hud-modal" style="width:min(840px, 96vw);">
       <div class="hud-modal-header">
         <span id="visitors-modal-title" style="display:flex;align-items:center;gap:8px;">
-          <span class="pulse-dot"></span> REAL-TIME VISITOR TELEMETRY // LIVE RADAR
+          <span class="pulse-dot"></span> REAL-TIME VISITOR ANALYTICS // WEEKLY • MONTHLY • YEARLY • ALL-TIME
         </span>
         <button type="button" class="hud-modal-close" data-close-modal="true">CLOSE ✕</button>
       </div>
       <div class="hud-modal-body">
-        <!-- 4 Real-Time KPI Counters -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px;">
-          <div style="padding:16px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--text-muted);">ONLINE RIGHT NOW</div>
-            <div id="vm-online-now" style="font-family:'Teko',sans-serif;font-size:2.7rem;line-height:1;color:var(--status-online);margin-top:4px;">1</div>
+        <!-- 6 Multi-Horizon KPI Counters -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(122px,1fr));gap:10px;margin-bottom:20px;">
+          <div style="padding:14px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text-muted);">ONLINE NOW</div>
+            <div id="vm-online-now" style="font-family:'Teko',sans-serif;font-size:2.35rem;line-height:1;color:var(--status-online);margin-top:4px;">1</div>
           </div>
-          <div style="padding:16px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--text-muted);">TODAY'S VISITS</div>
-            <div id="vm-today-visits" style="font-family:'Teko',sans-serif;font-size:2.7rem;line-height:1;color:var(--text-primary);margin-top:4px;">1</div>
+          <div style="padding:14px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text-muted);">TODAY</div>
+            <div id="vm-today-visits" style="font-family:'Teko',sans-serif;font-size:2.35rem;line-height:1;color:var(--text-primary);margin-top:4px;">1</div>
           </div>
-          <div style="padding:16px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--text-muted);">UNIQUE VISITORS</div>
-            <div id="vm-unique-visitors" style="font-family:'Teko',sans-serif;font-size:2.7rem;line-height:1;color:var(--accent-primary);margin-top:4px;">1</div>
+          <div style="padding:14px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text-muted);">THIS WEEK</div>
+            <div id="vm-week-visits" style="font-family:'Teko',sans-serif;font-size:2.35rem;line-height:1;color:var(--accent-primary);margin-top:4px;">1</div>
           </div>
-          <div style="padding:16px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--text-muted);">TOTAL STUDIO VIEWS</div>
-            <div id="vm-total-views" style="font-family:'Teko',sans-serif;font-size:2.7rem;line-height:1;color:var(--text-primary);margin-top:4px;">43</div>
+          <div style="padding:14px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text-muted);">THIS MONTH</div>
+            <div id="vm-month-visits" style="font-family:'Teko',sans-serif;font-size:2.35rem;line-height:1;color:var(--text-primary);margin-top:4px;">1</div>
+          </div>
+          <div style="padding:14px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text-muted);">THIS YEAR</div>
+            <div id="vm-year-visits" style="font-family:'Teko',sans-serif;font-size:2.35rem;line-height:1;color:var(--accent-primary);margin-top:4px;">1</div>
+          </div>
+          <div style="padding:14px;border:1px solid var(--border-hud);border-radius:10px;background:rgba(255,255,255,0.03);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text-muted);">ALL-TIME TOTAL</div>
+            <div id="vm-total-views" style="font-family:'Teko',sans-serif;font-size:2.35rem;line-height:1;color:var(--text-primary);margin-top:4px;">43</div>
           </div>
         </div>
 
+        <!-- Interactive Weekly / Monthly / Yearly Bar Chart -->
+        <div style="padding:18px;border:1px solid var(--border-hud);border-radius:12px;background:rgba(255,255,255,0.02);margin-bottom:20px;">
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--text-primary);">
+              VISITOR TRAFFIC BREAKDOWN BY TIME HORIZON
+            </span>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="gh-filter-btn active" data-visitor-chart="weekly" style="padding:5px 10px;font-size:0.66rem;">WEEKLY (7 DAYS)</button>
+              <button type="button" class="gh-filter-btn" data-visitor-chart="monthly" style="padding:5px 10px;font-size:0.66rem;">MONTHLY (JAN–DEC)</button>
+              <button type="button" class="gh-filter-btn" data-visitor-chart="yearly" style="padding:5px 10px;font-size:0.66rem;">YEARLY (ANNUAL)</button>
+            </div>
+          </div>
+          <div id="vm-chart-bars" style="display:grid;grid-auto-flow:column;grid-auto-columns:1fr;align-items:end;gap:8px;height:130px;padding-top:16px;border-bottom:1px solid var(--border-subtle);"></div>
+        </div>
+
         <!-- Active Connected Nodes List -->
-        <div style="margin-bottom:22px;">
+        <div style="margin-bottom:20px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--accent-primary);">
-            <span>ACTIVE CONNECTED VISITOR NODES (45S HEARTBEAT WINDOW)</span>
+            <span>ACTIVE CONNECTED VISITOR NODES (REAL-TIME 45S WINDOW)</span>
             <span id="vm-your-node">YOUR SESSION: NODE-0000</span>
           </div>
           <div id="vm-active-nodes-list" style="display:flex;flex-direction:column;gap:8px;"></div>

@@ -688,7 +688,7 @@
   }
 
   /**
-   * 9. Real-Time Visitor Heartbeat & Live Session Telemetry Radar
+   * 9. Real-Time Visitor Heartbeat & Multi-Horizon Analytics (Today / Week / Month / Year / All-Time)
    * Connects to clean extensionless endpoint: /api/visitors
    */
   function initRealtimeVisitors() {
@@ -697,13 +697,28 @@
     const statTotal = document.getElementById('stat-total-visits');
     const modal = document.getElementById('visitors-modal-backdrop');
 
+    // Main page horizon bar counters
+    const vbarOnline = document.getElementById('vbar-online');
+    const vbarToday = document.getElementById('vbar-today');
+    const vbarWeek = document.getElementById('vbar-week');
+    const vbarMonth = document.getElementById('vbar-month');
+    const vbarYear = document.getElementById('vbar-year');
+    const vbarTotal = document.getElementById('vbar-total');
+
+    // Modal horizon counters & chart
     const vmOnline = document.getElementById('vm-online-now');
     const vmToday = document.getElementById('vm-today-visits');
-    const vmUnique = document.getElementById('vm-unique-visitors');
+    const vmWeek = document.getElementById('vm-week-visits');
+    const vmMonth = document.getElementById('vm-month-visits');
+    const vmYear = document.getElementById('vm-year-visits');
     const vmTotal = document.getElementById('vm-total-views');
     const vmYourNode = document.getElementById('vm-your-node');
     const vmActiveList = document.getElementById('vm-active-nodes-list');
     const vmEventsList = document.getElementById('vm-recent-events');
+    const vmChartBars = document.getElementById('vm-chart-bars');
+
+    let activeChartHorizon = 'weekly';
+    let latestSeriesData = null;
 
     let tabId = '';
     try {
@@ -720,6 +735,35 @@
       const activeLink = document.querySelector('.hud-nav-links a.active');
       return (activeLink && activeLink.getAttribute('data-nav-section')) || 'home';
     }
+
+    function renderVisitorHorizonChart() {
+      if (!vmChartBars || !latestSeriesData) return;
+      const items = latestSeriesData[activeChartHorizon] || [];
+      if (items.length === 0) return;
+
+      const maxVal = Math.max(1, ...items.map((i) => Number(i.value) || 0));
+
+      vmChartBars.innerHTML = items.map((item) => {
+        const val = Number(item.value) || 0;
+        const heightPct = val > 0 ? Math.max(14, Math.round((val / maxVal) * 100)) : 6;
+        return `
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px;">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--text-primary);">${val}</span>
+            <div style="width:100%;max-width:38px;height:${heightPct}%;background:${val > 0 ? 'var(--accent-primary)' : 'rgba(255,255,255,0.1)'};border-radius:4px 4px 0 0;transition:height 0.35s ease;"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-muted);white-space:nowrap;">${item.label}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.querySelectorAll('[data-visitor-chart]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-visitor-chart]').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeChartHorizon = btn.getAttribute('data-visitor-chart') || 'weekly';
+        renderVisitorHorizonChart();
+      });
+    });
 
     async function sendHeartbeat(isInitial = false) {
       const currentTheme = document.documentElement.getAttribute('data-theme') || 'noir';
@@ -748,15 +792,32 @@
           statOnline.textContent = String(data.online_now);
         }
         if (statTotal) {
-          statTotal.textContent = `${data.total_views} Total Visits • ${data.today_visits} Today • Click for Radar`;
+          statTotal.textContent = `Week: ${data.week_visits} • Month: ${data.month_visits} • Year: ${data.year_visits}`;
         }
 
+        // Update Main Page 6-Horizon Bar
+        if (vbarOnline) vbarOnline.textContent = String(data.online_now);
+        if (vbarToday) vbarToday.textContent = String(data.today_visits);
+        if (vbarWeek) vbarWeek.textContent = String(data.week_visits);
+        if (vbarMonth) vbarMonth.textContent = String(data.month_visits);
+        if (vbarYear) vbarYear.textContent = String(data.year_visits);
+        if (vbarTotal) vbarTotal.textContent = String(data.total_views);
+
+        // Update Modal 6-Horizon KPIs
         if (vmOnline) vmOnline.textContent = String(data.online_now);
         if (vmToday) vmToday.textContent = String(data.today_visits);
-        if (vmUnique) vmUnique.textContent = String(data.unique_visitors);
+        if (vmWeek) vmWeek.textContent = String(data.week_visits);
+        if (vmMonth) vmMonth.textContent = String(data.month_visits);
+        if (vmYear) vmYear.textContent = String(data.year_visits);
         if (vmTotal) vmTotal.textContent = String(data.total_views);
+
         if (vmYourNode && data.your_node) {
           vmYourNode.textContent = `YOUR SESSION: ${data.your_node}`;
+        }
+
+        if (data.series) {
+          latestSeriesData = data.series;
+          renderVisitorHorizonChart();
         }
 
         if (vmActiveList && Array.isArray(data.active_nodes)) {
