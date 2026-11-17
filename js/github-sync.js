@@ -233,13 +233,13 @@
       readmeFallback: `# Interactive Date Invitation App\n\nInteractive micro-experience built with vanilla JavaScript, audio triggers, and playful UI physics.`
     },
     'rubicks_cube': {
-      title: '3D Rubik's Cube Spatial Matrix',
+      title: "3D Rubik's Cube Spatial Matrix",
       category: 'creative',
       categoryLabel: '3D WEBGL PUZZLE GAME',
       featured: true,
       playableRubik: true,
       stack: ['Three.js WebGL', 'JavaScript', '3D Matrix Rotations', 'Auto-Solver'],
-      summary: 'Interactive 3D 3×3×3 Rubik's Cube puzzle game with animated face rotations (U, D, L, R, F, B), one-click scramble, algorithmic auto-solver, and 360° orbit camera. Playable live inside this portfolio!',
+      summary: "Interactive 3D 3×3×3 Rubik's Cube puzzle game with animated face rotations (U, D, L, R, F, B), one-click scramble, algorithmic auto-solver, and 360° orbit camera. Playable live inside this portfolio!",
       readmeFallback: `# Rubik's Cube 3D Game 🧊\n\nInteractive 3D WebGL Rubik's Cube puzzle game with real-time face rotations, scramble generator, move counter, timer, and auto-solver.`
     },
     'mind': {
