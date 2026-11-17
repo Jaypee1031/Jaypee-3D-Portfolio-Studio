@@ -149,8 +149,8 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <base href="<?= htmlspecialchars($baseHref, ENT_QUOTES, 'UTF-8') ?>" />
   <meta name="csrf-token" content="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>" />
-  <title>JAYPEE STUDIO — John Paul Tuangco (@Jaypee1031) | 3D Full-Stack &amp; Flutter Portfolio</title>
-  <meta name="description" content="Interactive 3D Portfolio &amp; Live GitHub Studio of John Paul Tuangco (@Jaypee1031) — Full-Stack Developer, Flutter Architect &amp; Creative Technologist." />
+  <title>JAYPEE STUDIO - John Paul Tuangco (@Jaypee1031) | 3D Full-Stack &amp; Flutter Portfolio</title>
+  <meta name="description" content="Interactive 3D Portfolio &amp; Live GitHub Studio of John Paul Tuangco (@Jaypee1031) - Full-Stack Developer, Flutter Architect &amp; Creative Technologist." />
 
   <!-- Google Fonts: Ultra-Condensed Monumental Display (Teko, Six Caps, Anton) + Technical Sans & Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -168,7 +168,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
   <div class="hud-cross bl">+</div>
   <div class="hud-cross br">+</div>
 
-  <!-- Fixed 3D WebGL Scene Container (Sits at z-index: 5 — in front of giant hero display text, behind UI cards) -->
+  <!-- Fixed 3D WebGL Scene Container (Sits at z-index: 5 - in front of giant hero display text, behind UI cards) -->
   <div id="webgl-container" aria-hidden="true"></div>
   <div class="atmosphere-overlay" aria-hidden="true"></div>
 
@@ -177,14 +177,14 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
     <div class="hud-top-bar">
       <!-- Top-Left Coordinates & GitHub Live Sync Indicator -->
       <div class="hud-telemetry-left">
-        <span><strong class="loc-city">ISABELA, PH</strong> &nbsp; 16° 40' 19.2000" N &nbsp; 121° 27' 25.2000" E</span>
+        <span><strong class="loc-city">ISABELA, PH</strong> &nbsp; 16&deg; 40' 19.2000" N &nbsp; 121&deg; 27' 25.2000" E</span>
         <a href="https://github.com/Jaypee1031" target="_blank" rel="noopener" class="gh-live-pill" title="Connected to GitHub @Jaypee1031">
           <span class="pulse-dot"></span>
-          <span id="gh-sync-status-text">GH://JAYPEE1031 • 24 REPOS LIVE</span>
+          <span id="gh-sync-status-text">GH://JAYPEE1031 &bull; 24 REPOS LIVE</span>
         </a>
       </div>
 
-      <!-- Top-Center Trapezoidal Notched Navigation Cradle (Clean Extensionless Links — No .php or .html) -->
+      <!-- Top-Center Trapezoidal Notched Navigation Cradle (Clean Extensionless Links - No .php or .html) -->
       <nav class="hud-nav-cradle" aria-label="Primary Navigation">
         <div class="notch-top-line-left"></div>
         <div class="notch-wing-left"></div>
@@ -205,7 +205,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
       <div class="hud-telemetry-right">
         <button type="button" id="hud-visitors-btn" class="gh-live-pill" data-open-visitors="true" title="Click to open Real-Time Visitor Telemetry Radar">
           <span class="pulse-dot"></span>
-          <span id="hud-visitors-text">1 ONLINE • LIVE</span>
+          <span id="hud-visitors-text">1 ONLINE &bull; LIVE</span>
         </button>
         <span class="gh-live-pill" title="CSP Nonce + CSRF Token + WAF Shield + Extensionless Routing Active">
           🛡️ SECURED
@@ -242,7 +242,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
     <main class="hud-frame">
 
       <!-- ====================================================================
-           SECTION 01 // HERO ("JAYPEE STUDIO" — EXACT REFERENCE ARCHITECTURE)
+           SECTION 01 // HERO ("JAYPEE STUDIO" - EXACT REFERENCE ARCHITECTURE)
            ==================================================================== -->
       <section id="home" class="hero-section">
         <div>
@@ -264,7 +264,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
               <div>since</div>
               <div>
                 <span class="year-indent">2024</span>
-                <span class="dot-marker">•</span>
+                <span class="dot-marker">&bull;</span>
               </div>
             </div>
 
@@ -278,8 +278,8 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
         </div>
 
         <!-- Center Interactive 3D Drag/Orbit Zone over the Sculpted Cyber-Bust -->
-        <div id="hero-3d-stage" class="hero-3d-stage-zone" title="Drag to rotate 3D sculpture • Press T to switch color themes">
-          <span class="stage-hint-pill">DRAG TO ORBIT 3D SCULPTURE • PRESS [T] FOR COLOR THEMES</span>
+        <div id="hero-3d-stage" class="hero-3d-stage-zone" title="Drag to rotate 3D sculpture &bull; Press T to switch color themes">
+          <span class="stage-hint-pill">DRAG TO ORBIT 3D SCULPTURE &bull; PRESS [T] FOR COLOR THEMES</span>
         </div>
 
         <!-- Bottom Left Role Typography & Bottom Right Glowing Spherical "CONTACT" Orb -->
@@ -293,14 +293,14 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
             <div class="hero-sub-identity">
               <span class="identity-tag">JOHN PAUL TUANGCO</span>
               <span class="identity-tag">@JAYPEE1031</span>
-              <span class="identity-tag">FLUTTER • REACT • PHP • 3D</span>
+              <span class="identity-tag">FLUTTER &bull; REACT &bull; PHP &bull; 3D</span>
             </div>
           </div>
 
           <div class="orb-cta-wrap">
             <a href="contacts" data-nav-section="contacts" id="hero-orb-cta" class="orb-cta-btn">
               <span>CONTACT</span>
-              <span class="orb-cta-sub">INITIATE ↗</span>
+              <span class="orb-cta-sub">INITIATE &#8599;</span>
             </a>
           </div>
         </div>
@@ -339,9 +339,9 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
               <div class="telemetry-sub" id="stat-latest-push">Auto-synced with latest commits</div>
             </div>
             <div class="telemetry-card">
-              <div class="telemetry-value">5<span>×</span></div>
+              <div class="telemetry-value">5<span>&times;</span></div>
               <div class="telemetry-label">Core Engineering Domains</div>
-              <div class="telemetry-sub">Flutter • Full-Stack MVC • Three.js 3D • CV • Civic Tech</div>
+              <div class="telemetry-sub">Flutter &bull; Full-Stack MVC &bull; Three.js 3D &bull; CV &bull; Civic Tech</div>
             </div>
             <div class="telemetry-card" data-open-visitors="true" style="cursor:pointer;" title="Click to inspect Live Visitor Radar">
               <div class="telemetry-value"><span id="stat-live-online" style="color:var(--status-online);">1</span><span> ONLINE</span></div>
@@ -355,7 +355,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
             <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
               <div style="display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:0.75rem;">
                 <span class="pulse-dot"></span>
-                <span>REAL-TIME VISITOR TELEMETRY // TODAY • THIS WEEK • THIS MONTH • THIS YEAR • ALL-TIME</span>
+                <span>REAL-TIME VISITOR TELEMETRY // TODAY &bull; THIS WEEK &bull; THIS MONTH &bull; THIS YEAR &bull; ALL-TIME</span>
               </div>
               <button type="button" class="btn-hud" data-open-visitors="true" style="padding:6px 14px;font-size:0.68rem;">
                 📊 OPEN LIVE VISITOR ANALYTICS &amp; CHARTS
@@ -411,8 +411,8 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                   <span>01 // DUAL-PLATFORM ECOSYSTEM (WEB + MOBILE + DESKTOP)</span>
                   <span class="creation-badge">FLUTTER 3.47 + PHP 8 API</span>
                 </div>
-                <h3 class="creation-title">GUIDESCHED — COUNSELING &amp; SCHEDULING SYSTEM</h3>
-                <div class="creation-subtitle">Appointment-in-Guidance • GuideSched-App • Appointment-in-Guidance-App</div>
+                <h3 class="creation-title">GUIDESCHED - COUNSELING &amp; SCHEDULING SYSTEM</h3>
+                <div class="creation-subtitle">Appointment-in-Guidance &bull; GuideSched-App &bull; Appointment-in-Guidance-App</div>
                 <p class="creation-desc">
                   A comprehensive guidance counseling appointment and scheduling platform engineered for <strong>Cagasat High School</strong>. Built with a unified multi-role architecture (<strong>Student, Guidance Counselor &amp; Principal</strong>) across a full-featured <strong>PHP 8 Web Portal</strong> and a cross-platform <strong>Flutter 3.47 / Dart 3.13 Mobile &amp; Desktop Application</strong>.
                 </p>
@@ -430,9 +430,9 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                   <span class="tech-pill">JavaScript</span>
                 </div>
                 <div class="creation-actions">
-                  <a href="https://github.com/Jaypee1031/Appointment-in-Guidance" target="_blank" rel="noopener" class="btn-hud primary">APPOINTMENT IN GUIDANCE V2 ↗</a>
-                  <a href="https://github.com/Jaypee1031/GuideSched-App" target="_blank" rel="noopener" class="btn-hud">GUIDESCHED-APP (FLUTTER) ↗</a>
-                  <a href="https://github.com/Jaypee1031/Appointment-in-Guidance-App" target="_blank" rel="noopener" class="btn-hud">FULL SUITE REPO ↗</a>
+                  <a href="https://github.com/Jaypee1031/Appointment-in-Guidance" target="_blank" rel="noopener" class="btn-hud primary">APPOINTMENT IN GUIDANCE V2 &#8599;</a>
+                  <a href="https://github.com/Jaypee1031/GuideSched-App" target="_blank" rel="noopener" class="btn-hud">GUIDESCHED-APP (FLUTTER) &#8599;</a>
+                  <a href="https://github.com/Jaypee1031/Appointment-in-Guidance-App" target="_blank" rel="noopener" class="btn-hud">FULL SUITE REPO &#8599;</a>
                   <button type="button" class="btn-hud" data-inspect-repo="guidesched">📄 LIVE README</button>
                 </div>
               </div>
@@ -445,11 +445,11 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                 <div class="arch-diagram-nodes">
                   <div class="arch-node">
                     <strong>FLUTTER CLIENT</strong>
-                    <span>Dart 3.13 • Mobile &amp; Desktop</span>
+                    <span>Dart 3.13 &bull; Mobile &amp; Desktop</span>
                   </div>
                   <div class="arch-node" style="border-color:var(--accent-primary);">
                     <strong>PHP 8 REST API</strong>
-                    <span>Unified /api/v2 • Auth &amp; Sync</span>
+                    <span>Unified /api/v2 &bull; Auth &amp; Sync</span>
                   </div>
                   <div class="arch-node">
                     <strong>MYSQL / MARIADB</strong>
@@ -492,7 +492,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                 </div>
               </div>
               <div class="creation-actions">
-                <a href="https://github.com/Jaypee1031/Smart-Brew-and-Car-Wash---Full-stack-caf-management-system" target="_blank" rel="noopener" class="btn-hud primary">OPEN GITHUB REPO ↗</a>
+                <a href="https://github.com/Jaypee1031/Smart-Brew-and-Car-Wash---Full-stack-caf-management-system" target="_blank" rel="noopener" class="btn-hud primary">OPEN GITHUB REPO &#8599;</a>
                 <button type="button" class="btn-hud" data-inspect-repo="Smart-Brew-and-Car-Wash---Full-stack-caf-management-system">📄 LIVE README</button>
               </div>
             </article>
@@ -524,8 +524,8 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                 </div>
               </div>
               <div class="creation-actions">
-                <a href="https://github.com/Jaypee1031/Admission-Portal-V2-Update" target="_blank" rel="noopener" class="btn-hud primary">ADMISSION PORTAL V2 REPO ↗</a>
-                <a href="https://github.com/Jaypee1031/admission-portal" target="_blank" rel="noopener" class="btn-hud">V1 PORTAL REPO ↗</a>
+                <a href="https://github.com/Jaypee1031/Admission-Portal-V2-Update" target="_blank" rel="noopener" class="btn-hud primary">ADMISSION PORTAL V2 REPO &#8599;</a>
+                <a href="https://github.com/Jaypee1031/admission-portal" target="_blank" rel="noopener" class="btn-hud">V1 PORTAL REPO &#8599;</a>
                 <button type="button" class="btn-hud" data-inspect-repo="Admission-Portal-V2-Update">📄 LIVE README</button>
               </div>
             </article>
@@ -557,19 +557,19 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                 </div>
               </div>
               <div class="creation-actions">
-                <a href="https://github.com/Jaypee1031/cordon" target="_blank" rel="noopener" class="btn-hud primary">CORDON ANALYTICS ↗</a>
-                <a href="https://github.com/Jaypee1031/Cordon-Rescue" target="_blank" rel="noopener" class="btn-hud">CORDON RESCUE ↗</a>
+                <a href="https://github.com/Jaypee1031/cordon" target="_blank" rel="noopener" class="btn-hud primary">CORDON ANALYTICS &#8599;</a>
+                <a href="https://github.com/Jaypee1031/Cordon-Rescue" target="_blank" rel="noopener" class="btn-hud">CORDON RESCUE &#8599;</a>
               </div>
             </article>
 
-            <!-- 5. HOLO HAND v3.0 — Webcam Hand-Tracking & Mystic 3D HUD -->
+            <!-- 5. HOLO HAND v3.0 - Webcam Hand-Tracking & Mystic 3D HUD -->
             <article class="creation-card">
               <div>
                 <div class="creation-top-meta">
                   <span>05 // COMPUTER VISION &amp; HOLOGRAPHIC 3D HUD</span>
                   <span class="creation-badge">WEBCAM HAND TRACKING + WEBGL</span>
                 </div>
-                <h3 class="creation-title">HOLO HAND V3.0 — MYSTIC HOLOGRAPHIC SUITE</h3>
+                <h3 class="creation-title">HOLO HAND V3.0 - MYSTIC HOLOGRAPHIC SUITE</h3>
                 <div class="creation-subtitle">github.com/Jaypee1031/3D-Hand-Holo</div>
                 <p class="creation-desc">
                   Real-time webcam computer-vision hand-tracking and holographic Doctor Strange mystic spell/HUD interface built with <strong>HTML5 Canvas, WebGL Shaders, and JavaScript</strong>. Tracks finger landmarks in real time to cast interactive geometric mandalas, energy shields, and futuristic HUD controls.
@@ -588,7 +588,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                 </div>
               </div>
               <div class="creation-actions">
-                <a href="https://github.com/Jaypee1031/3D-Hand-Holo" target="_blank" rel="noopener" class="btn-hud primary">OPEN 3D-HAND-HOLO REPO ↗</a>
+                <a href="https://github.com/Jaypee1031/3D-Hand-Holo" target="_blank" rel="noopener" class="btn-hud primary">OPEN 3D-HAND-HOLO REPO &#8599;</a>
                 <button type="button" class="btn-hud" data-inspect-repo="3D-Hand-Holo">📄 LIVE README</button>
               </div>
             </article>
@@ -601,7 +601,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                   <span class="creation-badge">PHP 8 MVC + THREE.JS + KIOSK</span>
                 </div>
                 <h3 class="creation-title">QSU SCHOLARSHIP, OSAS LOGBOOK &amp; 3D STUDENT COUNCIL</h3>
-                <div class="creation-subtitle">Scholarship-Management-System • Log-Book-OSAS • Student-Council-Portal</div>
+                <div class="creation-subtitle">Scholarship-Management-System &bull; Log-Book-OSAS &bull; Student-Council-Portal</div>
                 <p class="creation-desc">
                   A suite of institutional platforms engineered for <strong>Quirino State University (QSU)</strong>: an <strong>Academic &amp; Service Scholarship MVC Portal</strong> with TCPDF generation, a full-screen <strong>OSAS Walk-In Digital Logbook Kiosk</strong> with audit trails, and a <strong>Three.js + PHP 8 Supreme Student Council 3D Portal</strong>.
                 </p>
@@ -609,7 +609,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                   <li>Custom PHP 8 MVC Scholarship Router &amp; TCPDF Engine</li>
                   <li>OSAS Walk-In Touch Kiosk, Audit Logs &amp; CSV Export</li>
                   <li>Three.js r187 + esbuild 3D Student Council Hub &amp; CMS</li>
-                  <li>Multi-Campus Support (Diffun • Cabarroguis • Maddela)</li>
+                  <li>Multi-Campus Support (Diffun &bull; Cabarroguis &bull; Maddela)</li>
                 </ul>
                 <div class="tech-stack-row">
                   <span class="tech-pill">PHP 8 MVC</span>
@@ -620,13 +620,13 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                 </div>
               </div>
               <div class="creation-actions">
-                <a href="https://github.com/Jaypee1031/Scholarship-Management-System" target="_blank" rel="noopener" class="btn-hud primary">SCHOLARSHIP REPO ↗</a>
-                <a href="https://github.com/Jaypee1031/Log-Book-OSAS" target="_blank" rel="noopener" class="btn-hud">OSAS LOGBOOK ↗</a>
-                <a href="https://github.com/Jaypee1031/Student-Council-Portal" target="_blank" rel="noopener" class="btn-hud">STUDENT COUNCIL 3D ↗</a>
+                <a href="https://github.com/Jaypee1031/Scholarship-Management-System" target="_blank" rel="noopener" class="btn-hud primary">SCHOLARSHIP REPO &#8599;</a>
+                <a href="https://github.com/Jaypee1031/Log-Book-OSAS" target="_blank" rel="noopener" class="btn-hud">OSAS LOGBOOK &#8599;</a>
+                <a href="https://github.com/Jaypee1031/Student-Council-Portal" target="_blank" rel="noopener" class="btn-hud">STUDENT COUNCIL 3D &#8599;</a>
               </div>
             </article>
 
-            <!-- 7. DTC — QR Code Attendance, Foot Traffic & Training System -->
+            <!-- 7. DTC - QR Code Attendance, Foot Traffic & Training System -->
             <article class="creation-card">
               <div>
                 <div class="creation-top-meta">
@@ -652,8 +652,8 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                 </div>
               </div>
               <div class="creation-actions">
-                <a href="https://github.com/Jaypee1031/DTC" target="_blank" rel="noopener" class="btn-hud primary">OPEN DTC REPO ↗</a>
-                <a href="https://github.com/Jaypee1031/DTC-PROJECT" target="_blank" rel="noopener" class="btn-hud">DTC-PROJECT ↗</a>
+                <a href="https://github.com/Jaypee1031/DTC" target="_blank" rel="noopener" class="btn-hud primary">OPEN DTC REPO &#8599;</a>
+                <a href="https://github.com/Jaypee1031/DTC-PROJECT" target="_blank" rel="noopener" class="btn-hud">DTC-PROJECT &#8599;</a>
                 <button type="button" class="btn-hud" data-inspect-repo="DTC">📄 LIVE README</button>
               </div>
             </article>
@@ -666,9 +666,9 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                   <span class="creation-badge">PLAYABLE LIVE IN BROWSER</span>
                 </div>
                 <h3 class="creation-title">CYBERPUNK SNAKE, 3D RUBIK'S MATRIX &amp; MOSAIC LAB</h3>
-                <div class="creation-subtitle">github.com/Jaypee1031/Snake • /rubicks_cube • /mosiac</div>
+                <div class="creation-subtitle">github.com/Jaypee1031/Snake &bull; /rubicks_cube &bull; /mosiac</div>
                 <p class="creation-desc">
-                  A collection of interactive frontend experiments, including a <strong>Neon Cyberpunk Snake Arcade Game</strong> built with HTML5 Canvas and vanilla JavaScript, a <strong>3D Rubik’s Cube</strong> matrix experiment, and a typographic <strong>Photo Mosaic</strong> renderer.
+                  A collection of interactive frontend experiments, including a <strong>Neon Cyberpunk Snake Arcade Game</strong> built with HTML5 Canvas and vanilla JavaScript, a <strong>3D Rubik's Cube</strong> matrix experiment, and a typographic <strong>Photo Mosaic</strong> renderer.
                 </p>
                 <div class="tech-stack-row">
                   <span class="tech-pill">HTML5 Canvas</span>
@@ -680,9 +680,9 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
               <div class="creation-actions">
                 <button type="button" class="btn-hud primary" data-open-snake="true">🎮 PLAY CYBERPUNK SNAKE LIVE</button>
                 <button type="button" class="btn-hud primary" data-open-rubik="true">🧊 PLAY 3D RUBIK'S CUBE LIVE</button>
-                <a href="https://github.com/Jaypee1031/rubicks_cube" target="_blank" rel="noopener" class="btn-hud">RUBIK'S REPO ↗</a>
-                <a href="https://github.com/Jaypee1031/Snake" target="_blank" rel="noopener" class="btn-hud">SNAKE REPO ↗</a>
-                <a href="https://github.com/Jaypee1031/mosiac" target="_blank" rel="noopener" class="btn-hud">MOSAIC REPO ↗</a>
+                <a href="https://github.com/Jaypee1031/rubicks_cube" target="_blank" rel="noopener" class="btn-hud">RUBIK'S REPO &#8599;</a>
+                <a href="https://github.com/Jaypee1031/Snake" target="_blank" rel="noopener" class="btn-hud">SNAKE REPO &#8599;</a>
+                <a href="https://github.com/Jaypee1031/mosiac" target="_blank" rel="noopener" class="btn-hud">MOSAIC REPO &#8599;</a>
               </div>
             </article>
 
@@ -775,7 +775,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
               </div>
 
               <p class="dossier-bio">
-                Based in <strong>Cordon, Isabela, Philippines</strong>, I design and engineer complete digital ecosystems—from cross-platform <strong>Flutter &amp; Dart</strong> mobile/desktop applications and <strong>Three.js / React 18</strong> web frontends to hardened <strong>PHP 8 MVC &amp; MySQL</strong> enterprise backends.
+                Based in <strong>Cordon, Isabela, Philippines</strong>, I design and engineer complete digital ecosystems-from cross-platform <strong>Flutter &amp; Dart</strong> mobile/desktop applications and <strong>Three.js / React 18</strong> web frontends to hardened <strong>PHP 8 MVC &amp; MySQL</strong> enterprise backends.
               </p>
               <p class="dossier-bio" style="margin-bottom:28px;">
                 My portfolio spans <strong>24+ public repositories</strong> including Quirino State University (QSU) admission, scholarship &amp; OSAS kiosk systems, Cagasat High School guidance counseling platforms (<em>GuideSched</em>), Cordon municipal emergency analytics, real-time webcam hand-tracking 3D HUDs (<em>HOLO HAND v3.0</em>), and commercial management portals.
@@ -796,7 +796,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                 </div>
                 <div class="kv-item">
                   <span>SECURITY ARCHITECTURE</span>
-                  <strong style="color:var(--accent-primary);">CSP • CSRF • WAF • Clean URLs</strong>
+                  <strong style="color:var(--accent-primary);">CSP &bull; CSRF &bull; WAF &bull; Clean URLs</strong>
                 </div>
               </div>
             </div>
@@ -987,7 +987,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                     <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text-muted);">GITHUB PROFILE &amp; 24+ REPOSITORIES</div>
                     <strong style="font-size:1.02rem;">github.com/Jaypee1031</strong>
                   </div>
-                  <span style="color:var(--accent-primary);font-family:'JetBrains Mono',monospace;">OPEN ↗</span>
+                  <span style="color:var(--accent-primary);font-family:'JetBrains Mono',monospace;">OPEN &#8599;</span>
                 </a>
 
                 <a href="https://www.facebook.com/search/top?q=jp%20tuangco" target="_blank" rel="noopener" class="channel-row">
@@ -995,13 +995,13 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                     <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text-muted);">FACEBOOK MESSENGER / SOCIAL</div>
                     <strong style="font-size:1.02rem;">JP Tuangco (Cordon, Isabela)</strong>
                   </div>
-                  <span style="color:var(--accent-primary);font-family:'JetBrains Mono',monospace;">CONNECT ↗</span>
+                  <span style="color:var(--accent-primary);font-family:'JetBrains Mono',monospace;">CONNECT &#8599;</span>
                 </a>
 
                 <div class="channel-row">
                   <div>
                     <div style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text-muted);">SECURITY &amp; ROUTING STATUS</div>
-                    <strong style="font-size:1.02rem;">Extensionless Clean URLs • CSP + CSRF Shield</strong>
+                    <strong style="font-size:1.02rem;">Extensionless Clean URLs &bull; CSP + CSRF Shield</strong>
                   </div>
                   <span style="color:var(--status-online);font-family:'JetBrains Mono',monospace;">● PROTECTED</span>
                 </div>
@@ -1034,7 +1034,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                   <textarea id="cf-message" name="message" rows="4" class="form-control" placeholder="Tell me about your project goals, timeline, and system requirements..." maxlength="2000" required></textarea>
                 </div>
                 <button type="submit" class="btn-hud primary" style="justify-content:center;padding:14px;">
-                  🔒 SEND SECURED TRANSMISSION TO JAYPEE STUDIO ↗
+                  🔒 SEND SECURED TRANSMISSION TO JAYPEE STUDIO &#8599;
                 </button>
                 <div id="contact-form-feedback" style="display:none;margin-top:8px;padding:12px;border:1px solid var(--accent-primary);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:0.74rem;color:var(--text-primary);"></div>
               </form>
@@ -1097,7 +1097,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
                   <div>
                     <span style="display:block;font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--text-muted);">PAYMENT NETWORK</span>
-                    <strong style="font-size:0.95rem;color:#22c55e;">InstaPay • QR Ph</strong>
+                    <strong style="font-size:0.95rem;color:#22c55e;">InstaPay &bull; QR Ph</strong>
                   </div>
                   <div>
                     <span style="display:block;font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--text-muted);">RECIPIENT NODE</span>
@@ -1105,7 +1105,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                   </div>
                   <div>
                     <span style="display:block;font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--text-muted);">ACCOUNT NUMBER</span>
-                    <strong style="font-family:'JetBrains Mono',monospace;font-size:0.95rem;color:var(--accent-primary);">•••••••••••• (HIDDEN)</strong>
+                    <strong style="font-family:'JetBrains Mono',monospace;font-size:0.95rem;color:var(--accent-primary);">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull; (HIDDEN)</strong>
                   </div>
                 </div>
               </div>
@@ -1141,7 +1141,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
               <div class="qr-image-frame" data-open-support-qr="true" title="Click to enlarge QR Code for scanning">
                 <img
                   src="assets/instapay-qr.png?v=2"
-                  alt="Anonymous InstaPay QR Code — JAYPEE STUDIO (@Jaypee1031)"
+                  alt="Anonymous InstaPay QR Code - JAYPEE STUDIO (@Jaypee1031)"
                   loading="lazy"
                 />
               </div>
@@ -1151,10 +1151,10 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
                   JAYPEE STUDIO // @JAYPEE1031
                 </div>
                 <div style="font-family:'JetBrains Mono',monospace;font-size:0.74rem;color:var(--text-secondary);margin-top:4px;">
-                  Account Identity: <strong>ANONYMOUS • PROTECTED</strong>
+                  Account Identity: <strong>ANONYMOUS &bull; PROTECTED</strong>
                 </div>
                 <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--text-muted);margin-top:8px;">
-                  Click QR code to enlarge • Works with any InstaPay / QR Ph app
+                  Click QR code to enlarge &bull; Works with any InstaPay / QR Ph app
                 </div>
               </div>
             </div>
@@ -1163,8 +1163,8 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
 
         <!-- Studio Footer -->
         <footer class="studio-footer">
-          <div>© 2024–2026 JAYPEE STUDIO // JOHN PAUL TUANGCO (@Jaypee1031). ALL RIGHTS RESERVED.</div>
-          <div>🛡️ SECURED PHP ROUTER (ZERO .PHP/.HTML IN URL) • AUTO-SYNCED WITH GITHUB API</div>
+          <div>© 2024-2026 JAYPEE STUDIO // JOHN PAUL TUANGCO (@Jaypee1031). ALL RIGHTS RESERVED.</div>
+          <div>🛡️ SECURED PHP ROUTER (ZERO .PHP/.HTML IN URL) &bull; AUTO-SYNCED WITH GITHUB API</div>
         </footer>
       </div>
 
@@ -1179,7 +1179,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
       <div class="hud-modal-header">
         <span id="readme-modal-title">README.MD // GITHUB INSPECTOR</span>
         <div style="display:flex;gap:10px;align-items:center;">
-          <a id="readme-modal-gh-link" href="https://github.com/Jaypee1031" target="_blank" rel="noopener" class="hud-modal-close" style="text-decoration:none;">OPEN ON GITHUB ↗</a>
+          <a id="readme-modal-gh-link" href="https://github.com/Jaypee1031" target="_blank" rel="noopener" class="hud-modal-close" style="text-decoration:none;">OPEN ON GITHUB &#8599;</a>
           <button type="button" class="hud-modal-close" data-close-modal="true">ESC / CLOSE ✕</button>
         </div>
       </div>
@@ -1218,7 +1218,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
       </div>
       <div class="hud-modal-body" style="text-align:center;">
         <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;font-family:'JetBrains Mono',monospace;font-size:0.76rem;">
-          <span>DRAG CUBE TO ORBIT 360° • KEYS: [U D L R F B]</span>
+          <span>DRAG CUBE TO ORBIT 360&deg; &bull; KEYS: [U D L R F B]</span>
           <span>MOVES: <strong id="rubik-move-count" style="color:var(--accent-primary);">0</strong></span>
           <span>TIME: <strong id="rubik-timer" style="color:var(--accent-primary);">00:00</strong></span>
           <span>STATUS: <strong id="rubik-status" style="color:var(--status-online);">SOLVED</strong></span>
@@ -1251,7 +1251,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
     <div class="hud-modal" style="width:min(840px, 96vw);">
       <div class="hud-modal-header">
         <span id="visitors-modal-title" style="display:flex;align-items:center;gap:8px;">
-          <span class="pulse-dot"></span> REAL-TIME VISITOR ANALYTICS // WEEKLY • MONTHLY • YEARLY • ALL-TIME
+          <span class="pulse-dot"></span> REAL-TIME VISITOR ANALYTICS // WEEKLY &bull; MONTHLY &bull; YEARLY &bull; ALL-TIME
         </span>
         <button type="button" class="hud-modal-close" data-close-modal="true">CLOSE ✕</button>
       </div>
@@ -1292,7 +1292,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
             </span>
             <div style="display:flex;gap:6px;">
               <button type="button" class="gh-filter-btn active" data-visitor-chart="weekly" style="padding:5px 10px;font-size:0.66rem;">WEEKLY (7 DAYS)</button>
-              <button type="button" class="gh-filter-btn" data-visitor-chart="monthly" style="padding:5px 10px;font-size:0.66rem;">MONTHLY (JAN–DEC)</button>
+              <button type="button" class="gh-filter-btn" data-visitor-chart="monthly" style="padding:5px 10px;font-size:0.66rem;">MONTHLY (JAN-DEC)</button>
               <button type="button" class="gh-filter-btn" data-visitor-chart="yearly" style="padding:5px 10px;font-size:0.66rem;">YEARLY (ANNUAL)</button>
             </div>
           </div>
@@ -1332,12 +1332,12 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
         <div style="background:#ffffff;padding:16px;border-radius:14px;display:inline-block;max-width:340px;width:100%;box-shadow:0 16px 40px rgba(0,0,0,0.6);">
           <img
             src="assets/instapay-qr.png?v=2"
-            alt="Anonymous InstaPay QR Code — JAYPEE STUDIO (@Jaypee1031)"
+            alt="Anonymous InstaPay QR Code - JAYPEE STUDIO (@Jaypee1031)"
             style="width:100%;height:auto;display:block;border-radius:8px;"
           />
         </div>
         <div style="margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:0.76rem;color:var(--text-primary);">
-          <strong>JAYPEE STUDIO (@JAYPEE1031)</strong> • ANONYMOUS QR
+          <strong>JAYPEE STUDIO (@JAYPEE1031)</strong> &bull; ANONYMOUS QR
         </div>
         <div style="margin-top:6px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text-muted);">
           Scan using GCash, Maya, BDO, BPI, or any InstaPay QR Ph app.

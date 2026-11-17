@@ -25,16 +25,16 @@
    */
   const REPO_ENRICHMENT_DB = {
     '3D-Hand-Holo': {
-      title: 'HOLO HAND v3.0 — Webcam Hand-Tracking & Mystic 3D HUD',
+      title: 'HOLO HAND v3.0 - Webcam Hand-Tracking & Mystic 3D HUD',
       category: 'creative',
       categoryLabel: 'COMPUTER VISION + 3D HUD',
       featured: true,
       stack: ['MediaPipe / Hand Tracking', 'HTML5 Canvas', 'WebGL Shaders', 'Orbitron HUD', 'JavaScript'],
       summary: 'Real-time webcam computer-vision hand tracking and holographic Doctor Strange mystic spell/HUD suite (HOLO HAND v3.0), featuring gesture recognition, particle shields, and neon cyan/magenta/gold visual shaders.',
-      readmeFallback: `# HOLO HAND v3.0 — Ultimate Holographic & Doctor Strange Mystic Suite\n\nReal-time webcam hand-tracking holographic interface and mystic particle engine built with HTML5 Canvas, WebGL, and JavaScript.`
+      readmeFallback: `# HOLO HAND v3.0 - Ultimate Holographic & Doctor Strange Mystic Suite\n\nReal-time webcam hand-tracking holographic interface and mystic particle engine built with HTML5 Canvas, WebGL, and JavaScript.`
     },
     'Admission-Portal-V2-Update': {
-      title: 'QSU Admission Portal V2 — Modular University System',
+      title: 'QSU Admission Portal V2 - Modular University System',
       category: 'fullstack',
       categoryLabel: 'PHP MVC + OMR + AI CHAT',
       featured: true,
@@ -43,7 +43,7 @@
       readmeFallback: `# QSU Admission Portal V2 Update\n\nFull-stack modular university admission portal featuring applicant management, automated F1-A/F2 PDF generation, exam slot scheduling, OMR scanner tools, and analytics.`
     },
     'Appointment-in-Guidance': {
-      title: 'Appointment in Guidance — Multi-Role Portal (V2)',
+      title: 'Appointment in Guidance - Multi-Role Portal (V2)',
       category: 'fullstack',
       categoryLabel: 'STUDENT • COUNSELOR • PRINCIPAL',
       featured: true,
@@ -52,7 +52,7 @@
       readmeFallback: `# Appointment in Guidance Portal\n\nMulti-role guidance counseling web portal supporting Student, Counselor, and Principal workflows.`
     },
     'Appointment-in-Guidance-App': {
-      title: 'Appointment in Guidance App — Full-Stack + Flutter Suite',
+      title: 'Appointment in Guidance App - Full-Stack + Flutter Suite',
       category: 'mobile',
       categoryLabel: 'FLUTTER + PHP + PWA',
       featured: true,
@@ -61,7 +61,7 @@
       readmeFallback: `# Appointment in Guidance App\n\nComplete cross-platform Flutter & PHP guidance scheduling suite.`
     },
     'GuideSched-App': {
-      title: 'GuideSched-App — Standalone Flutter Mobile & Web Client',
+      title: 'GuideSched-App - Standalone Flutter Mobile & Web Client',
       category: 'mobile',
       categoryLabel: 'FLUTTER ANDROID / IOS / WEB',
       featured: true,
@@ -97,22 +97,22 @@
       readmeFallback: `# QSU Supreme Student Council 3D Portal\n\nInteractive Three.js + PHP 8 portal and content management system for the QSU Supreme Student Council.`
     },
     'Jaypee-3D-Portfolio-Studio': {
-      title: 'JAYPEE STUDIO — 3D WebGL Portfolio & GitHub Sync Engine',
+      title: 'JAYPEE STUDIO - 3D WebGL Portfolio & GitHub Sync Engine',
       category: 'creative',
       categoryLabel: 'THREE.JS + LIVE GITHUB API',
       featured: true,
       stack: ['Three.js WebGL', '7-Theme Engine', 'GitHub REST API', 'PHP Proxy Cache', 'CSS3 HUD'],
       summary: 'Interactive 3D cyber-brutalist studio portfolio featuring a procedurally sculpted glossy obsidian 3D bust with studio headphones, 4 switchable 3D rigs, 7 live color themes, and real-time GitHub repository synchronization.',
-      readmeFallback: `# JAYPEE STUDIO — 3D Portfolio\n\nInteractive Three.js 3D portfolio auto-synced with https://github.com/Jaypee1031.`
+      readmeFallback: `# JAYPEE STUDIO - 3D Portfolio\n\nInteractive Three.js 3D portfolio auto-synced with https://github.com/Jaypee1031.`
     },
     'guidesched': {
-      title: 'GuideSched — Counseling & Scheduling Platform',
+      title: 'GuideSched - Counseling & Scheduling Platform',
       category: 'mobile',
       categoryLabel: 'FLUTTER + PHP API',
       featured: true,
       stack: ['Flutter 3.47', 'Dart 3.13', 'PHP 8 REST API', 'MySQL / MariaDB', 'JavaScript'],
       summary: 'Complete guidance counseling appointment and scheduling ecosystem built for Cagasat High School. Features a unified 2-role architecture (Student & Guidance Counselor) across a cross-platform Flutter Mobile/Desktop app and a PHP Web Portal with an Emerald & Forest Green design system.',
-      readmeFallback: `# GuideSched — Guidance Counseling Appointment & Scheduling System\n\n**GuideSched** is a complete, modern guidance counseling appointment and scheduling platform designed for **Cagasat High School**.\n\n### Key Highlights\n- **Dual-Platform Ecosystem**: Cross-platform Flutter 3.47 / Dart 3.13 Mobile & Desktop application paired with a full-featured PHP 8 Web Portal.\n- **2-User Role System**: Dedicated workflows for Students (booking counseling sessions, tracking status) and Guidance Counselors (schedule management, case notes, analytics).\n- **REST API Architecture**: Unified \`/api/\` endpoints connecting mobile and web clients to MySQL/MariaDB.`
+      readmeFallback: `# GuideSched - Guidance Counseling Appointment & Scheduling System\n\n**GuideSched** is a complete, modern guidance counseling appointment and scheduling platform designed for **Cagasat High School**.\n\n### Key Highlights\n- **Dual-Platform Ecosystem**: Cross-platform Flutter 3.47 / Dart 3.13 Mobile & Desktop application paired with a full-featured PHP 8 Web Portal.\n- **2-User Role System**: Dedicated workflows for Students (booking counseling sessions, tracking status) and Guidance Counselors (schedule management, case notes, analytics).\n- **REST API Architecture**: Unified \`/api/\` endpoints connecting mobile and web clients to MySQL/MariaDB.`
     },
     'guideschedapp': {
       title: 'GuideSched Mobile & Desktop Client',
@@ -151,7 +151,7 @@
       readmeFallback: `# Cordon Municipal Incident & Barangay Statistics System\n\nEmergency incident reporting and statistical analytics system for the Municipality of Cordon, Isabela.\n\n### Key Modules\n- **Citizen Incident Reporting**: OTP-verified incident submission with photo evidence and purok/barangay geolocation.\n- **Multi-Horizon Analytics**: Weekly, monthly, quarterly, semi-annual, and barangay-by-barangay accident & rescue charts powered by Chart.js.\n- **Staff & Admin Dashboards**: Workflow status tracking (pending, verified, finished, rejected) and automated PDF report generation.`
     },
     'Cordon-Rescue': {
-      title: 'Cordon Rescue — Emergency Response Suite',
+      title: 'Cordon Rescue - Emergency Response Suite',
       category: 'system',
       categoryLabel: 'EMERGENCY DISPATCH',
       featured: false,
@@ -160,7 +160,7 @@
       readmeFallback: `# Cordon-Rescue\n\nEmergency response and municipal rescue coordination repository for Cordon, Isabela.`
     },
     'DTC': {
-      title: 'DTC — QR Attendance, Foot Traffic & Training System',
+      title: 'DTC - QR Attendance, Foot Traffic & Training System',
       category: 'system',
       categoryLabel: 'QR SCANNER + FOOT TRAFFIC + PHP',
       featured: true,
@@ -233,17 +233,17 @@
       readmeFallback: `# Interactive Date Invitation App\n\nInteractive micro-experience built with vanilla JavaScript, audio triggers, and playful UI physics.`
     },
     'rubicks_cube': {
-      title: '3D Rubik’s Cube Spatial Matrix',
+      title: '3D Rubik's Cube Spatial Matrix',
       category: 'creative',
       categoryLabel: '3D WEBGL PUZZLE GAME',
       featured: true,
       playableRubik: true,
       stack: ['Three.js WebGL', 'JavaScript', '3D Matrix Rotations', 'Auto-Solver'],
-      summary: 'Interactive 3D 3×3×3 Rubik’s Cube puzzle game with animated face rotations (U, D, L, R, F, B), one-click scramble, algorithmic auto-solver, and 360° orbit camera. Playable live inside this portfolio!',
+      summary: 'Interactive 3D 3×3×3 Rubik's Cube puzzle game with animated face rotations (U, D, L, R, F, B), one-click scramble, algorithmic auto-solver, and 360° orbit camera. Playable live inside this portfolio!',
       readmeFallback: `# Rubik's Cube 3D Game 🧊\n\nInteractive 3D WebGL Rubik's Cube puzzle game with real-time face rotations, scramble generator, move counter, timer, and auto-solver.`
     },
     'mind': {
-      title: 'Mind — Cognitive Concept Sandbox',
+      title: 'Mind - Cognitive Concept Sandbox',
       category: 'creative',
       categoryLabel: 'CONCEPT SANDBOX',
       featured: false,
@@ -273,7 +273,7 @@
       {
         name: 'Admission-Portal-V2-Update',
         html_url: 'https://github.com/Jaypee1031/Admission-Portal-V2-Update',
-        description: 'Quirino State University (QSU) Admission Portal V2 — Full-Stack Modular University Admission, Applicant Verification & Automated PDF System',
+        description: 'Quirino State University (QSU) Admission Portal V2 - Full-Stack Modular University Admission, Applicant Verification & Automated PDF System',
         language: 'PHP',
         stargazers_count: 0,
         forks_count: 0,
@@ -286,7 +286,7 @@
       {
         name: 'Scholarship-Management-System',
         html_url: 'https://github.com/Jaypee1031/Scholarship-Management-System',
-        description: 'QSU OSAS Academic & Service Scholarship Management System — Custom PHP MVC Portal with Student & Admin Workflows and TCPDF Document Generation',
+        description: 'QSU OSAS Academic & Service Scholarship Management System - Custom PHP MVC Portal with Student & Admin Workflows and TCPDF Document Generation',
         language: 'PHP',
         stargazers_count: 0,
         forks_count: 0,
@@ -364,7 +364,7 @@
       {
         name: '3D-Hand-Holo',
         html_url: 'https://github.com/Jaypee1031/3D-Hand-Holo',
-        description: 'HOLO HAND v3.0 — Real-Time Webcam Hand-Tracking Holographic & Doctor Strange Mystic HUD Suite built with HTML5 Canvas, WebGL & Computer Vision',
+        description: 'HOLO HAND v3.0 - Real-Time Webcam Hand-Tracking Holographic & Doctor Strange Mystic HUD Suite built with HTML5 Canvas, WebGL & Computer Vision',
         language: 'HTML',
         stargazers_count: 0,
         forks_count: 0,
@@ -377,7 +377,7 @@
       {
         name: 'Jaypee-3D-Portfolio-Studio',
         html_url: 'https://github.com/Jaypee1031/Jaypee-3D-Portfolio-Studio',
-        description: 'JAYPEE STUDIO — Interactive 3D WebGL Portfolio & Live GitHub Auto-Sync Studio for John Paul Tuangco (@Jaypee1031)',
+        description: 'JAYPEE STUDIO - Interactive 3D WebGL Portfolio & Live GitHub Auto-Sync Studio for John Paul Tuangco (@Jaypee1031)',
         language: 'JavaScript',
         stargazers_count: 0,
         forks_count: 0,
@@ -592,7 +592,7 @@
   function enrichRepository(rawRepo) {
     const known = REPO_ENRICHMENT_DB[rawRepo.name];
     const cleanName = rawRepo.name
-      .replace(/---/g, ' — ')
+      .replace(/---/g, ' - ')
       .replace(/[-_]/g, ' ')
       .replace(/\b\w/g, (c) => c.toUpperCase());
 
