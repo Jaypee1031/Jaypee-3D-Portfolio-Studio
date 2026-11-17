@@ -861,10 +861,12 @@
      * Cross-Device Real-Time Cloud Presence & Visitor Telemetry Engine
      * Synchronizes Online Now, Today, Weekly, Monthly, Yearly & All-Time totals
      * across ALL PCs, phones, tablets, and laptops in real time via ntfy.sh pub/sub + SSE!
+     * - Instant leave detection on mobile & desktop via visibilitychange, pagehide & beforeunload
+     * - Clock-skew-proof local timestamping + 12s fast TTL (5s active heartbeat)
      */
-    const CLOUD_TOPIC = 'jaypee1031_studio_telemetry_v3';
+    const CLOUD_TOPIC = 'jaypee1031_studio_telemetry_v4';
     const CLOUD_URL = `https://ntfy.sh/${CLOUD_TOPIC}`;
-    const ACTIVE_TTL_MS = 50000; // 50 seconds active heartbeat window
+    const ACTIVE_TTL_MS = 12000; // 12 seconds strict live window (heartbeats every 5s while visible)
 
     function detectDevicePlatform() {
       const ua = navigator.userAgent || '';
@@ -907,18 +909,22 @@
     const initYearKey = String(todayDateInit.getFullYear());
 
     const cloudState = {
-      total_views: 57,
-      daily: { [initTodayKey]: 12 },
-      monthly: { [initMonthKey]: 30 },
-      yearly: { '2024': 124, '2025': 348, [initYearKey]: 57 },
+      total_views: 58,
+      daily: { [initTodayKey]: 13 },
+      monthly: { [initMonthKey]: 31 },
+      yearly: { '2024': 124, '2025': 348, [initYearKey]: 58 },
       unique_devices: { [deviceId]: true },
       nodes: {},
       events: []
     };
 
-    function ingestCloudPayload(pkt, msgTimeMs) {
+    /**
+     * Ingests a cloud packet using the receiver's own clock (ageMsAgo)
+     * so clock differences between PC, phone, and server never cause stuck nodes.
+     */
+    function ingestCloudPayload(pkt, ageMsAgo = 0) {
       if (!pkt || typeof pkt !== 'object') return;
-      const ts = msgTimeMs || pkt.ts || Date.now();
+      const localSeenAt = Date.now() - Math.max(0, ageMsAgo);
 
       if (pkt.totals && typeof pkt.totals === 'object') {
         const t = pkt.totals;
@@ -949,14 +955,14 @@
       if (pkt.tab_id) {
         if (pkt.type === 'leave') {
           delete cloudState.nodes[pkt.tab_id];
-        } else if (Date.now() - ts <= ACTIVE_TTL_MS) {
+        } else if (ageMsAgo <= ACTIVE_TTL_MS) {
           cloudState.nodes[pkt.tab_id] = {
             tab_id: pkt.tab_id,
             node: pkt.node || 'NODE-USER',
             section: (pkt.section || 'HOME').toUpperCase(),
             theme: (pkt.theme || 'NOIR').toUpperCase(),
             platform: pkt.platform || 'Web Client',
-            last_seen: ts
+            last_seen: localSeenAt
           };
         }
       }
@@ -984,17 +990,19 @@
       const monthKey = dNow.toISOString().slice(0, 7);
       const yearKey = String(dNow.getFullYear());
 
-      // Always keep current tab alive in cloudState.nodes
-      cloudState.nodes[tabId] = {
-        tab_id: tabId,
-        node: myNodeLabel,
-        section: getCurrentActiveSection().toUpperCase(),
-        theme: (document.documentElement.getAttribute('data-theme') || 'noir').toUpperCase(),
-        platform: myPlatform,
-        last_seen: now
-      };
+      // Keep current tab alive in cloudState.nodes if visible
+      if (document.visibilityState !== 'hidden') {
+        cloudState.nodes[tabId] = {
+          tab_id: tabId,
+          node: myNodeLabel,
+          section: getCurrentActiveSection().toUpperCase(),
+          theme: (document.documentElement.getAttribute('data-theme') || 'noir').toUpperCase(),
+          platform: myPlatform,
+          last_seen: now
+        };
+      }
 
-      // Prune expired nodes (>50s)
+      // Strictly prune any remote node that hasn't sent a heartbeat in the last 12 seconds
       Object.keys(cloudState.nodes).forEach((k) => {
         if (k !== tabId && (now - (cloudState.nodes[k].last_seen || 0)) > ACTIVE_TTL_MS) {
           delete cloudState.nodes[k];
@@ -1010,7 +1018,7 @@
       }));
 
       const onlineCount = Math.max(1, activeNodes.length);
-      const todayVisits = Math.max(onlineCount, Number(cloudState.daily[todayKey]) || 12);
+      const todayVisits = Math.max(onlineCount, Number(cloudState.daily[todayKey]) || 13);
 
       const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
       const weeklySeries = [];
@@ -1026,9 +1034,9 @@
         });
       }
 
-      const monthVisits = Math.max(weekSum, Number(cloudState.monthly[monthKey]) || 30);
-      const yearVisits = Math.max(monthVisits, Number(cloudState.yearly[yearKey]) || 57);
-      const totalViews = Math.max(yearVisits, Number(cloudState.total_views) || 57);
+      const monthVisits = Math.max(weekSum, Number(cloudState.monthly[monthKey]) || 31);
+      const yearVisits = Math.max(monthVisits, Number(cloudState.yearly[yearKey]) || 58);
+      const totalViews = Math.max(yearVisits, Number(cloudState.total_views) || 58);
 
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const monthlySeries = monthNames.map((mName, idx) => {
@@ -1061,10 +1069,9 @@
       });
     }
 
-    async function publishCloudHeartbeat(type = 'heartbeat') {
-      const payload = {
+    function publishCloudHeartbeat(type = 'heartbeat') {
+      const payload = JSON.stringify({
         type,
-        ts: Date.now(),
         tab_id: tabId,
         device_id: deviceId,
         node: myNodeLabel,
@@ -1077,31 +1084,47 @@
           monthly: cloudState.monthly,
           yearly: cloudState.yearly
         }
-      };
+      });
 
-      try {
-        await fetch(CLOUD_URL, {
-          method: 'POST',
-          body: JSON.stringify(payload),
-          cache: 'no-store'
-        });
-      } catch (_) {}
+      if (type === 'leave' && navigator.sendBeacon) {
+        try {
+          navigator.sendBeacon(CLOUD_URL, payload);
+        } catch (_) {}
+      }
+
+      fetch(CLOUD_URL, {
+        method: 'POST',
+        body: payload,
+        keepalive: true,
+        cache: 'no-store'
+      }).catch(() => {});
     }
 
     async function initCloudSyncStream() {
-      // 1. Fetch cached history from ntfy.sh so we know all active nodes & latest totals immediately
+      // 1. Fetch recent history from ntfy.sh using server-relative timestamps (immune to device clock skew)
       try {
-        const res = await fetch(`${CLOUD_URL}/json?poll=1&since=all`, { cache: 'no-store' });
+        const res = await fetch(`${CLOUD_URL}/json?poll=1&since=30m`, { cache: 'no-store' });
         if (res.ok) {
           const text = await res.text();
           const lines = text.trim().split('\n').filter(Boolean);
+          const parsedEnvs = [];
+          let maxServerTime = 0;
+
           lines.forEach((line) => {
             try {
               const env = JSON.parse(line);
               if (env && env.event === 'message' && env.message) {
-                const pkt = JSON.parse(env.message);
-                ingestCloudPayload(pkt, (env.time || 0) * 1000);
+                if ((env.time || 0) > maxServerTime) maxServerTime = env.time;
+                parsedEnvs.push(env);
               }
+            } catch (_) {}
+          });
+
+          parsedEnvs.forEach((env) => {
+            try {
+              const pkt = JSON.parse(env.message);
+              const ageMs = Math.max(0, (maxServerTime - (env.time || maxServerTime)) * 1000);
+              ingestCloudPayload(pkt, ageMs);
             } catch (_) {}
           });
         }
@@ -1110,9 +1133,9 @@
       // 2. Count this new session visit once per browser tab session
       let alreadyCounted = false;
       try {
-        alreadyCounted = sessionStorage.getItem('jaypee_counted_visit_v3') === '1';
+        alreadyCounted = sessionStorage.getItem('jaypee_counted_visit_v4') === '1';
         if (!alreadyCounted) {
-          sessionStorage.setItem('jaypee_counted_visit_v3', '1');
+          sessionStorage.setItem('jaypee_counted_visit_v4', '1');
         }
       } catch (_) {}
 
@@ -1121,17 +1144,16 @@
         const tk = dNow.toISOString().slice(0, 10);
         const mk = dNow.toISOString().slice(0, 7);
         const yk = String(dNow.getFullYear());
-        cloudState.total_views = (Number(cloudState.total_views) || 57) + 1;
-        cloudState.daily[tk] = (Number(cloudState.daily[tk]) || 12) + 1;
-        cloudState.monthly[mk] = (Number(cloudState.monthly[mk]) || 30) + 1;
-        cloudState.yearly[yk] = (Number(cloudState.yearly[yk]) || 57) + 1;
+        cloudState.total_views = (Number(cloudState.total_views) || 58) + 1;
+        cloudState.daily[tk] = (Number(cloudState.daily[tk]) || 13) + 1;
+        cloudState.monthly[mk] = (Number(cloudState.monthly[mk]) || 31) + 1;
+        cloudState.yearly[yk] = (Number(cloudState.yearly[yk]) || 58) + 1;
       }
 
       buildAndRenderCloudTelemetry();
-      await publishCloudHeartbeat('join');
+      publishCloudHeartbeat('join');
 
-      // 3. Subscribe to real-time SSE stream so when a phone or another laptop opens the site,
-      //    ONLINE NOW jumps from 1 to 2+ in <0.2 seconds!
+      // 3. Subscribe to real-time SSE stream (0ms age on arrival)
       if (typeof EventSource !== 'undefined') {
         try {
           const es = new EventSource(`${CLOUD_URL}/sse`);
@@ -1140,7 +1162,7 @@
               const env = JSON.parse(ev.data);
               if (env && env.event === 'message' && env.message) {
                 const pkt = JSON.parse(env.message);
-                ingestCloudPayload(pkt, (env.time || 0) * 1000);
+                ingestCloudPayload(pkt, 0);
                 buildAndRenderCloudTelemetry();
               }
             } catch (_) {}
@@ -1148,25 +1170,30 @@
         } catch (_) {}
       }
 
-      // 4. Broadcast leave when closing tab/window
-      window.addEventListener('beforeunload', () => {
-        const leavePkt = JSON.stringify({
-          type: 'leave',
-          ts: Date.now(),
-          tab_id: tabId,
-          node: myNodeLabel
-        });
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon(CLOUD_URL, leavePkt);
+      // 4. Instant Leave / Re-Join on Mobile & Desktop (visibilitychange + pagehide + beforeunload)
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          publishCloudHeartbeat('leave');
+        } else if (document.visibilityState === 'visible') {
+          publishCloudHeartbeat('join');
+          buildAndRenderCloudTelemetry();
         }
+      });
+
+      window.addEventListener('pagehide', () => {
+        publishCloudHeartbeat('leave');
+      });
+
+      window.addEventListener('beforeunload', () => {
+        publishCloudHeartbeat('leave');
       });
     }
 
     async function sendHeartbeat(isInitial = false) {
       if (isInitial) {
         initCloudSyncStream();
-      } else {
-        await publishCloudHeartbeat('heartbeat');
+      } else if (document.visibilityState !== 'hidden') {
+        publishCloudHeartbeat('heartbeat');
         buildAndRenderCloudTelemetry();
       }
 
@@ -1197,10 +1224,10 @@
       }
     });
 
-    // Send initial cloud sync immediately + keep active presence alive across all devices
+    // Send initial cloud sync immediately + prune expired nodes every 1s + heartbeat every 5s
     sendHeartbeat(true);
-    setInterval(() => buildAndRenderCloudTelemetry(), 4000);
-    setInterval(() => sendHeartbeat(false), 16000);
+    setInterval(() => buildAndRenderCloudTelemetry(), 1000);
+    setInterval(() => sendHeartbeat(false), 5000);
   }
 
   /**
