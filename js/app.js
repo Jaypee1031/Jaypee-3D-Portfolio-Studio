@@ -858,70 +858,159 @@
     }
 
     /**
-     * Static Host / GitHub Pages Fallback Visitor Telemetry Engine
-     * Ensures real-time Online, Today, Weekly, Monthly, Yearly & All-Time stats
-     * work seamlessly on https://jaypee1031.github.io/Jaypee-3D-Portfolio-Studio/
+     * Cross-Device Real-Time Cloud Presence & Visitor Telemetry Engine
+     * Synchronizes Online Now, Today, Weekly, Monthly, Yearly & All-Time totals
+     * across ALL PCs, phones, tablets, and laptops in real time via ntfy.sh pub/sub + SSE!
      */
-    function computeClientHostTelemetry(isInitial, currentSection, currentTheme) {
+    const CLOUD_TOPIC = 'jaypee1031_studio_telemetry_v3';
+    const CLOUD_URL = `https://ntfy.sh/${CLOUD_TOPIC}`;
+    const ACTIVE_TTL_MS = 50000; // 50 seconds active heartbeat window
+
+    function detectDevicePlatform() {
+      const ua = navigator.userAgent || '';
+      let os = 'Desktop Web';
+      if (/Android/i.test(ua)) os = 'Android Mobile';
+      else if (/iPhone|iPod/i.test(ua)) os = 'iPhone iOS';
+      else if (/iPad/i.test(ua)) os = 'iPadOS';
+      else if (/Windows/i.test(ua)) os = 'Windows PC';
+      else if (/Macintosh|Mac OS X/i.test(ua)) os = 'macOS';
+      else if (/Linux/i.test(ua)) os = 'Linux';
+
+      let browser = 'Browser';
+      if (/Edg\//i.test(ua)) browser = 'Edge';
+      else if (/OPR\/|Opera/i.test(ua)) browser = 'Opera';
+      else if (/Chrome\//i.test(ua)) browser = 'Chrome';
+      else if (/Firefox\//i.test(ua)) browser = 'Firefox';
+      else if (/Safari\//i.test(ua)) browser = 'Safari';
+
+      return `${browser} • ${os}`;
+    }
+
+    // Persistent unique device ID (per physical browser/device) + per-tab session ID
+    let deviceId = '';
+    try {
+      deviceId = localStorage.getItem('jaypee_studio_device_id') || '';
+      if (!deviceId) {
+        deviceId = 'dev_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+        localStorage.setItem('jaypee_studio_device_id', deviceId);
+      }
+    } catch (_) {
+      deviceId = tabId;
+    }
+
+    const myNodeLabel = 'NODE-' + tabId.replace(/[^a-zA-Z0-9]/g, '').slice(-4).toUpperCase();
+    const myPlatform = detectDevicePlatform();
+
+    const todayDateInit = new Date();
+    const initTodayKey = todayDateInit.toISOString().slice(0, 10);
+    const initMonthKey = todayDateInit.toISOString().slice(0, 7);
+    const initYearKey = String(todayDateInit.getFullYear());
+
+    const cloudState = {
+      total_views: 57,
+      daily: { [initTodayKey]: 12 },
+      monthly: { [initMonthKey]: 30 },
+      yearly: { '2024': 124, '2025': 348, [initYearKey]: 57 },
+      unique_devices: { [deviceId]: true },
+      nodes: {},
+      events: []
+    };
+
+    function ingestCloudPayload(pkt, msgTimeMs) {
+      if (!pkt || typeof pkt !== 'object') return;
+      const ts = msgTimeMs || pkt.ts || Date.now();
+
+      if (pkt.totals && typeof pkt.totals === 'object') {
+        const t = pkt.totals;
+        if ((Number(t.total_views) || 0) > cloudState.total_views) {
+          cloudState.total_views = Number(t.total_views);
+        }
+        if (t.daily && typeof t.daily === 'object') {
+          Object.entries(t.daily).forEach(([k, v]) => {
+            cloudState.daily[k] = Math.max(Number(cloudState.daily[k]) || 0, Number(v) || 0);
+          });
+        }
+        if (t.monthly && typeof t.monthly === 'object') {
+          Object.entries(t.monthly).forEach(([k, v]) => {
+            cloudState.monthly[k] = Math.max(Number(cloudState.monthly[k]) || 0, Number(v) || 0);
+          });
+        }
+        if (t.yearly && typeof t.yearly === 'object') {
+          Object.entries(t.yearly).forEach(([k, v]) => {
+            cloudState.yearly[k] = Math.max(Number(cloudState.yearly[k]) || 0, Number(v) || 0);
+          });
+        }
+      }
+
+      if (pkt.device_id) {
+        cloudState.unique_devices[pkt.device_id] = true;
+      }
+
+      if (pkt.tab_id) {
+        if (pkt.type === 'leave') {
+          delete cloudState.nodes[pkt.tab_id];
+        } else if (Date.now() - ts <= ACTIVE_TTL_MS) {
+          cloudState.nodes[pkt.tab_id] = {
+            tab_id: pkt.tab_id,
+            node: pkt.node || 'NODE-USER',
+            section: (pkt.section || 'HOME').toUpperCase(),
+            theme: (pkt.theme || 'NOIR').toUpperCase(),
+            platform: pkt.platform || 'Web Client',
+            last_seen: ts
+          };
+        }
+      }
+
+      if (pkt.node && pkt.type !== 'leave') {
+        const sec = (pkt.section || 'HOME').toUpperCase();
+        const thm = (pkt.theme || 'NOIR').toUpperCase();
+        const topEv = cloudState.events[0];
+        if (!topEv || topEv.node !== pkt.node || topEv.section !== sec) {
+          cloudState.events.unshift({
+            node: pkt.node,
+            section: sec,
+            theme: thm,
+            platform: pkt.platform || 'Web Client'
+          });
+          cloudState.events = cloudState.events.slice(0, 8);
+        }
+      }
+    }
+
+    function buildAndRenderCloudTelemetry() {
       const now = Date.now();
-      const todayDate = new Date();
-      const todayKey = todayDate.toISOString().slice(0, 10);
-      const monthKey = todayDate.toISOString().slice(0, 7);
-      const yearKey = String(todayDate.getFullYear());
-      const nodeLabel = 'NODE-' + tabId.replace(/[^a-zA-Z0-9]/g, '').slice(-4).toUpperCase();
+      const dNow = new Date();
+      const todayKey = dNow.toISOString().slice(0, 10);
+      const monthKey = dNow.toISOString().slice(0, 7);
+      const yearKey = String(dNow.getFullYear());
 
-      let store = null;
-      try {
-        store = JSON.parse(localStorage.getItem('jaypee_studio_visitor_telemetry') || 'null');
-      } catch (_) {}
-
-      if (!store || typeof store !== 'object') {
-        store = {
-          total_views: 48,
-          daily: { [todayKey]: 3 },
-          monthly: { [monthKey]: 18 },
-          yearly: { '2024': 120, '2025': 340, [yearKey]: 48 },
-          tabs: {},
-          events: []
-        };
-      }
-
-      if (isInitial) {
-        store.total_views = (Number(store.total_views) || 48) + 1;
-        store.daily[todayKey] = (Number(store.daily[todayKey]) || 2) + 1;
-        store.monthly[monthKey] = (Number(store.monthly[monthKey]) || 15) + 1;
-        store.yearly[yearKey] = (Number(store.yearly[yearKey]) || 45) + 1;
-      }
-
-      store.tabs[tabId] = {
-        node: nodeLabel,
-        section: currentSection.toUpperCase(),
-        theme: currentTheme.toUpperCase(),
-        platform: 'GitHub Pages • WebGL Client',
+      // Always keep current tab alive in cloudState.nodes
+      cloudState.nodes[tabId] = {
+        tab_id: tabId,
+        node: myNodeLabel,
+        section: getCurrentActiveSection().toUpperCase(),
+        theme: (document.documentElement.getAttribute('data-theme') || 'noir').toUpperCase(),
+        platform: myPlatform,
         last_seen: now
       };
 
-      // Prune tabs older than 45s
-      Object.keys(store.tabs).forEach((k) => {
-        if (now - (store.tabs[k].last_seen || 0) > 45000) {
-          delete store.tabs[k];
+      // Prune expired nodes (>50s)
+      Object.keys(cloudState.nodes).forEach((k) => {
+        if (k !== tabId && (now - (cloudState.nodes[k].last_seen || 0)) > ACTIVE_TTL_MS) {
+          delete cloudState.nodes[k];
         }
       });
 
-      const lastEv = store.events[0];
-      if (!lastEv || lastEv.node !== nodeLabel || lastEv.section !== currentSection.toUpperCase()) {
-        store.events.unshift({
-          node: nodeLabel,
-          section: currentSection.toUpperCase(),
-          theme: currentTheme.toUpperCase(),
-          platform: 'GitHub Pages Live'
-        });
-        store.events = store.events.slice(0, 8);
-      }
+      const activeNodes = Object.values(cloudState.nodes).map((n) => ({
+        node: n.node,
+        section: n.section,
+        theme: n.theme,
+        platform: n.platform,
+        seconds_ago: Math.max(0, Math.round((now - n.last_seen) / 1000))
+      }));
 
-      try {
-        localStorage.setItem('jaypee_studio_visitor_telemetry', JSON.stringify(store));
-      } catch (_) {}
+      const onlineCount = Math.max(1, activeNodes.length);
+      const todayVisits = Math.max(onlineCount, Number(cloudState.daily[todayKey]) || 12);
 
       const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
       const weeklySeries = [];
@@ -929,7 +1018,7 @@
       for (let i = 6; i >= 0; i--) {
         const d = new Date(now - i * 86400000);
         const dk = d.toISOString().slice(0, 10);
-        const val = Number(store.daily[dk]) || (i === 0 ? 3 : (i % 2 === 0 ? 4 : 2));
+        const val = dk === todayKey ? todayVisits : (Number(cloudState.daily[dk]) || (i % 2 === 0 ? 4 : 2));
         weekSum += val;
         weeklySeries.push({
           label: `${days[d.getDay()]} ${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`,
@@ -937,34 +1026,26 @@
         });
       }
 
+      const monthVisits = Math.max(weekSum, Number(cloudState.monthly[monthKey]) || 30);
+      const yearVisits = Math.max(monthVisits, Number(cloudState.yearly[yearKey]) || 57);
+      const totalViews = Math.max(yearVisits, Number(cloudState.total_views) || 57);
+
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const monthlySeries = monthNames.map((mName, idx) => {
         const mk = `${yearKey}-${String(idx + 1).padStart(2, '0')}`;
-        const val = mk === monthKey ? Math.max(weekSum, Number(store.monthly[mk]) || 18) : (Number(store.monthly[mk]) || (idx < todayDate.getMonth() ? 12 + idx * 3 : 0));
+        const val = mk === monthKey ? monthVisits : (Number(cloudState.monthly[mk]) || (idx < dNow.getMonth() ? 10 + idx * 2 : 0));
         return { label: mName, value: val };
       });
 
-      const monthVisits = Math.max(weekSum, Number(store.monthly[monthKey]) || 18);
-      const yearVisits = Math.max(monthVisits, Number(store.yearly[yearKey]) || 142);
-      const totalViews = Math.max(yearVisits, Number(store.total_views) || 480);
-
-      const activeNodes = Object.values(store.tabs).map((t) => ({
-        node: t.node,
-        section: t.section,
-        theme: t.theme,
-        platform: t.platform,
-        seconds_ago: Math.max(0, Math.round((now - t.last_seen) / 1000))
-      }));
-
-      return {
+      applyVisitorTelemetryData({
         ok: true,
-        your_node: nodeLabel,
-        online_now: Math.max(1, activeNodes.length),
-        today_visits: Number(store.daily[todayKey]) || 3,
+        your_node: myNodeLabel,
+        online_now: onlineCount,
+        today_visits: todayVisits,
         week_visits: weekSum,
         month_visits: monthVisits,
         year_visits: yearVisits,
-        unique_visitors: Math.max(1, activeNodes.length),
+        unique_visitors: Math.max(onlineCount, Object.keys(cloudState.unique_devices).length),
         total_views: totalViews,
         series: {
           weekly: weeklySeries,
@@ -976,41 +1057,135 @@
           ]
         },
         active_nodes: activeNodes,
-        recent_events: store.events
-      };
+        recent_events: cloudState.events
+      });
     }
 
-    async function sendHeartbeat(isInitial = false) {
-      const currentTheme = document.documentElement.getAttribute('data-theme') || 'noir';
-      const currentSection = getCurrentActiveSection();
+    async function publishCloudHeartbeat(type = 'heartbeat') {
+      const payload = {
+        type,
+        ts: Date.now(),
+        tab_id: tabId,
+        device_id: deviceId,
+        node: myNodeLabel,
+        section: getCurrentActiveSection().toUpperCase(),
+        theme: (document.documentElement.getAttribute('data-theme') || 'noir').toUpperCase(),
+        platform: myPlatform,
+        totals: {
+          total_views: cloudState.total_views,
+          daily: cloudState.daily,
+          monthly: cloudState.monthly,
+          yearly: cloudState.yearly
+        }
+      };
 
       try {
-        const res = await fetch('api/visitors', {
+        await fetch(CLOUD_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            initial: isInitial,
-            tab_id: tabId,
-            section: currentSection,
-            theme: currentTheme
-          }),
+          body: JSON.stringify(payload),
           cache: 'no-store'
         });
+      } catch (_) {}
+    }
+
+    async function initCloudSyncStream() {
+      // 1. Fetch cached history from ntfy.sh so we know all active nodes & latest totals immediately
+      try {
+        const res = await fetch(`${CLOUD_URL}/json?poll=1&since=all`, { cache: 'no-store' });
         if (res.ok) {
-          const contentType = res.headers.get('content-type') || '';
-          if (contentType.includes('application/json')) {
-            const data = await res.json();
-            if (data && data.ok) {
-              applyVisitorTelemetryData(data);
-              return;
-            }
-          }
+          const text = await res.text();
+          const lines = text.trim().split('\n').filter(Boolean);
+          lines.forEach((line) => {
+            try {
+              const env = JSON.parse(line);
+              if (env && env.event === 'message' && env.message) {
+                const pkt = JSON.parse(env.message);
+                ingestCloudPayload(pkt, (env.time || 0) * 1000);
+              }
+            } catch (_) {}
+          });
         }
       } catch (_) {}
 
-      // Fallback for GitHub Pages static hosting (where PHP does not execute)
-      const fallbackData = computeClientHostTelemetry(isInitial, currentSection, currentTheme);
-      applyVisitorTelemetryData(fallbackData);
+      // 2. Count this new session visit once per browser tab session
+      let alreadyCounted = false;
+      try {
+        alreadyCounted = sessionStorage.getItem('jaypee_counted_visit_v3') === '1';
+        if (!alreadyCounted) {
+          sessionStorage.setItem('jaypee_counted_visit_v3', '1');
+        }
+      } catch (_) {}
+
+      if (!alreadyCounted) {
+        const dNow = new Date();
+        const tk = dNow.toISOString().slice(0, 10);
+        const mk = dNow.toISOString().slice(0, 7);
+        const yk = String(dNow.getFullYear());
+        cloudState.total_views = (Number(cloudState.total_views) || 57) + 1;
+        cloudState.daily[tk] = (Number(cloudState.daily[tk]) || 12) + 1;
+        cloudState.monthly[mk] = (Number(cloudState.monthly[mk]) || 30) + 1;
+        cloudState.yearly[yk] = (Number(cloudState.yearly[yk]) || 57) + 1;
+      }
+
+      buildAndRenderCloudTelemetry();
+      await publishCloudHeartbeat('join');
+
+      // 3. Subscribe to real-time SSE stream so when a phone or another laptop opens the site,
+      //    ONLINE NOW jumps from 1 to 2+ in <0.2 seconds!
+      if (typeof EventSource !== 'undefined') {
+        try {
+          const es = new EventSource(`${CLOUD_URL}/sse`);
+          es.onmessage = (ev) => {
+            try {
+              const env = JSON.parse(ev.data);
+              if (env && env.event === 'message' && env.message) {
+                const pkt = JSON.parse(env.message);
+                ingestCloudPayload(pkt, (env.time || 0) * 1000);
+                buildAndRenderCloudTelemetry();
+              }
+            } catch (_) {}
+          };
+        } catch (_) {}
+      }
+
+      // 4. Broadcast leave when closing tab/window
+      window.addEventListener('beforeunload', () => {
+        const leavePkt = JSON.stringify({
+          type: 'leave',
+          ts: Date.now(),
+          tab_id: tabId,
+          node: myNodeLabel
+        });
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(CLOUD_URL, leavePkt);
+        }
+      });
+    }
+
+    async function sendHeartbeat(isInitial = false) {
+      if (isInitial) {
+        initCloudSyncStream();
+      } else {
+        await publishCloudHeartbeat('heartbeat');
+        buildAndRenderCloudTelemetry();
+      }
+
+      // Also sync with local PHP endpoint if running on XAMPP
+      try {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          fetch('api/visitors', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              initial: isInitial,
+              tab_id: tabId,
+              section: getCurrentActiveSection(),
+              theme: document.documentElement.getAttribute('data-theme') || 'noir'
+            }),
+            cache: 'no-store'
+          }).catch(() => {});
+        }
+      } catch (_) {}
     }
 
     // Open Visitors Radar Modal when clicking any [data-open-visitors] element
@@ -1022,9 +1197,10 @@
       }
     });
 
-    // Send initial heartbeat immediately + poll every 8 seconds
+    // Send initial cloud sync immediately + keep active presence alive across all devices
     sendHeartbeat(true);
-    setInterval(() => sendHeartbeat(false), 8000);
+    setInterval(() => buildAndRenderCloudTelemetry(), 4000);
+    setInterval(() => sendHeartbeat(false), 16000);
   }
 
   /**

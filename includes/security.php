@@ -127,7 +127,7 @@ function send_security_headers(string $nonce): void {
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com data:",
         "img-src 'self' data: https://avatars.githubusercontent.com https://*.githubusercontent.com",
-        "connect-src 'self' https://api.github.com",
+        "connect-src 'self' https://api.github.com https://ntfy.sh",
         "frame-ancestors 'self'",
         "base-uri 'self'",
         "form-action 'self' mailto:"
