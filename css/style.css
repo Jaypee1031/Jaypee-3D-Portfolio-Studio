@@ -1671,6 +1671,118 @@ body {
 }
 
 /* ==========================================================================
+   SUPPORT & INSTAPAY QR TERMINAL SECTION
+   ========================================================================== */
+.support-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.support-info-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-hud);
+  border-radius: 16px;
+  padding: 38px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+}
+
+.support-tier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.support-tier-pill {
+  padding: 16px 14px;
+  border: 1px solid var(--border-hud);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: left;
+}
+.support-tier-pill:hover,
+.support-tier-pill.active {
+  border-color: var(--accent-primary);
+  background: rgba(var(--accent-rgb), 0.12);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+.support-tier-pill strong {
+  display: block;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-top: 6px;
+}
+.support-tier-pill span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.qr-terminal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--accent-primary);
+  border-radius: 18px;
+  padding: 28px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.8), 0 0 36px rgba(var(--accent-rgb), 0.16);
+  backdrop-filter: blur(16px);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+}
+.qr-terminal-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.9), 0 0 50px rgba(var(--accent-rgb), 0.26);
+}
+
+.qr-image-frame {
+  background: #ffffff;
+  padding: 14px;
+  border-radius: 14px;
+  display: inline-block;
+  max-width: 310px;
+  width: 100%;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.55);
+  cursor: zoom-in;
+  transition: transform 0.25s ease;
+}
+.qr-image-frame:hover {
+  transform: scale(1.03);
+}
+
+.qr-image-frame img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.instapay-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.instapay-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.66rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-hud);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
    MODALS: LIVE README INSPECTOR & PLAYABLE CYBERPUNK SNAKE ARCADE
    ========================================================================== */
 .hud-modal-backdrop {
@@ -1784,12 +1896,16 @@ body {
   }
   .about-grid,
   .services-grid,
-  .contact-grid {
+  .contact-grid,
+  .support-grid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 720px) {
+  .support-tier-grid {
+    grid-template-columns: 1fr;
+  }
   .hero-section {
     padding: 140px 20px 90px;
   }

@@ -128,7 +128,8 @@ $validSections = [
     '/creations' => 'creations',
     '/about' => 'about',
     '/services' => 'services',
-    '/contacts' => 'contacts'
+    '/contacts' => 'contacts',
+    '/support' => 'support'
 ];
 
 $initialSection = $validSections[strtolower($routeKey)] ?? 'home';
@@ -194,6 +195,7 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
           <li><a href="about" data-nav-section="about">About</a></li>
           <li><a href="services" data-nav-section="services">Services</a></li>
           <li><a href="contacts" data-nav-section="contacts">Contacts</a></li>
+          <li><a href="support" data-nav-section="support">Support</a></li>
         </ul>
         <div class="notch-wing-right"></div>
         <div class="notch-top-line-right"></div>
@@ -1040,6 +1042,128 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
           </div>
         </section>
 
+        <div class="section-divider"></div>
+
+        <!-- ==================================================================
+             SECTION 07 // SUPPORT MY WORK & OPEN-SOURCE CREATIONS (LANDBANK INSTAPAY QR)
+             ================================================================== -->
+        <section id="support" class="studio-section">
+          <div class="section-header">
+            <div>
+              <div class="section-index">06 // FUEL THE STUDIO &amp; OPEN-SOURCE</div>
+              <h2 class="section-title">GIVE SUPPORT TO MY WORK</h2>
+            </div>
+            <p class="section-desc">
+              If my open-source repositories, Flutter apps, university portals, or 3D web experiments have helped or inspired you, you can support my work directly via <strong>LANDBANK InstaPay QR</strong>.
+            </p>
+          </div>
+
+          <div class="support-grid">
+            <!-- Left: Support Tiers, Account Info & Compatible Apps -->
+            <div class="support-info-panel">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-family:'JetBrains Mono',monospace;font-size:0.74rem;color:var(--accent-primary);">
+                <span>DIRECT CREATOR SUPPORT // INSTAPAY QR PH</span>
+                <span style="color:var(--status-online);">● VERIFIED ACCOUNT</span>
+              </div>
+
+              <h3 style="font-family:'Teko',sans-serif;font-size:2.4rem;line-height:0.95;text-transform:uppercase;margin-bottom:12px;">
+                FUEL FUTURE 3D, FLUTTER &amp; FULL-STACK CREATIONS
+              </h3>
+              <p style="font-size:0.93rem;line-height:1.68;color:var(--text-secondary);">
+                Every contribution goes directly toward maintaining my open-source GitHub repositories, server infrastructure, and building new interactive 3D and full-stack tools for students and communities.
+              </p>
+
+              <!-- Interactive Support Tier Badges -->
+              <div class="support-tier-grid">
+                <div class="support-tier-pill active" data-support-tier="Coffee Fuel">
+                  <span>TIER 01 // ☕</span>
+                  <strong>Buy Me a Coffee</strong>
+                  <span style="display:block;margin-top:4px;">Late-night coding fuel</span>
+                </div>
+                <div class="support-tier-pill" data-support-tier="Open-Source Boost">
+                  <span>TIER 02 // 🚀</span>
+                  <strong>Open-Source Boost</strong>
+                  <span style="display:block;margin-top:4px;">Support 24+ GitHub repos</span>
+                </div>
+                <div class="support-tier-pill" data-support-tier="Studio Patron">
+                  <span>TIER 03 // 💎</span>
+                  <strong>Studio Sponsor</strong>
+                  <span style="display:block;margin-top:4px;">Fuel new 3D &amp; Flutter builds</span>
+                </div>
+              </div>
+
+              <!-- Official Landbank Account Readout -->
+              <div style="padding:18px 20px;border:1px solid var(--border-hud);border-radius:12px;background:rgba(255,255,255,0.03);margin-bottom:20px;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+                  <div>
+                    <span style="display:block;font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--text-muted);">BANK / NETWORK</span>
+                    <strong style="font-size:0.95rem;color:#22c55e;">LANDBANK • InstaPay</strong>
+                  </div>
+                  <div>
+                    <span style="display:block;font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--text-muted);">ACCOUNT NAME</span>
+                    <strong style="font-size:0.95rem;color:var(--text-primary);">JOHN PAUL TUANGCO</strong>
+                  </div>
+                  <div>
+                    <span style="display:block;font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--text-muted);">ACCOUNT NUMBER</span>
+                    <strong style="font-family:'JetBrains Mono',monospace;font-size:0.95rem;color:var(--accent-primary);">XXXXXX6808</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Action Buttons -->
+              <div class="creation-actions">
+                <button type="button" class="btn-hud primary" data-open-support-qr="true">
+                  🔍 ENLARGE QR CODE TO SCAN
+                </button>
+                <a href="assets/landbank-instapay-qr.jpg" download="John-Paul-Tuangco-Landbank-InstaPay-QR.jpg" class="btn-hud">
+                  ⬇ DOWNLOAD QR IMAGE
+                </a>
+                <button type="button" id="btn-copy-acct-name" class="btn-hud">
+                  📋 COPY ACCOUNT NAME
+                </button>
+              </div>
+
+              <!-- Compatible Banking & E-Wallet Apps -->
+              <div class="instapay-badges-row">
+                <span class="instapay-badge">✓ LANDBANK</span>
+                <span class="instapay-badge">✓ GCASH</span>
+                <span class="instapay-badge">✓ MAYA</span>
+                <span class="instapay-badge">✓ BDO / BPI</span>
+                <span class="instapay-badge">✓ UNIONBANK</span>
+                <span class="instapay-badge">✓ GOTYME / SEABANK</span>
+              </div>
+            </div>
+
+            <!-- Right: Official Landbank InstaPay QR Terminal Card -->
+            <div class="qr-terminal-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--text-muted);">
+                <span>SCAN TO SUPPORT // INSTAPAY</span>
+                <span style="color:var(--accent-primary);" id="selected-tier-badge">☕ COFFEE FUEL</span>
+              </div>
+
+              <div class="qr-image-frame" data-open-support-qr="true" title="Click to enlarge QR Code for scanning">
+                <img
+                  src="assets/landbank-instapay-qr.jpg"
+                  alt="LANDBANK InstaPay QR Code — JOHN PAUL TUANGCO (Account Number: XXXXXX6808)"
+                  loading="lazy"
+                />
+              </div>
+
+              <div style="margin-top:16px;">
+                <div style="font-family:'Teko',sans-serif;font-size:1.75rem;line-height:1;letter-spacing:0.04em;color:var(--text-primary);">
+                  JOHN PAUL TUANGCO
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.74rem;color:var(--text-secondary);margin-top:4px;">
+                  LANDBANK Account: <strong>XXXXXX6808</strong>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--text-muted);margin-top:8px;">
+                  Click QR code to enlarge • Works with any InstaPay / QR Ph app
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- Studio Footer -->
         <footer class="studio-footer">
           <div>© 2024–2026 JAYPEE STUDIO // JOHN PAUL TUANGCO (@Jaypee1031). ALL RIGHTS RESERVED.</div>
@@ -1193,6 +1317,39 @@ $baseHref = ($basePath === '' ? '/' : $basePath . '/');
             RECENT LIVE SECTION &amp; THEME TELEMETRY LOG
           </div>
           <div id="vm-recent-events" style="display:flex;flex-direction:column;gap:6px;font-family:'JetBrains Mono',monospace;font-size:0.71rem;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 05 // FULL-SIZE LANDBANK INSTAPAY QR SCANNER MODAL
+       ====================================================================== -->
+  <div id="support-qr-modal-backdrop" class="hud-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="support-qr-modal-title">
+    <div class="hud-modal" style="width:min(480px, 95vw);">
+      <div class="hud-modal-header">
+        <span id="support-qr-modal-title">☕ SUPPORT JOHN PAUL TUANGCO // INSTAPAY QR</span>
+        <button type="button" class="hud-modal-close" data-close-modal="true">CLOSE ✕</button>
+      </div>
+      <div class="hud-modal-body" style="text-align:center;">
+        <div style="background:#ffffff;padding:16px;border-radius:14px;display:inline-block;max-width:340px;width:100%;box-shadow:0 16px 40px rgba(0,0,0,0.6);">
+          <img
+            src="assets/landbank-instapay-qr.jpg"
+            alt="LANDBANK InstaPay QR Code — JOHN PAUL TUANGCO (Account: XXXXXX6808)"
+            style="width:100%;height:auto;display:block;border-radius:8px;"
+          />
+        </div>
+        <div style="margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:0.76rem;color:var(--text-primary);">
+          <strong>JOHN PAUL TUANGCO</strong> • LANDBANK (XXXXXX6808)
+        </div>
+        <div style="margin-top:6px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text-muted);">
+          Scan using Landbank, GCash, Maya, BDO, BPI, or any InstaPay banking app.
+        </div>
+        <div style="margin-top:16px;display:flex;justify-content:center;gap:10px;">
+          <a href="assets/landbank-instapay-qr.jpg" download="John-Paul-Tuangco-Landbank-InstaPay-QR.jpg" class="btn-hud primary">
+            ⬇ SAVE QR TO PHONE / PC
+          </a>
+          <button type="button" class="btn-hud" data-close-modal="true">DONE</button>
         </div>
       </div>
     </div>

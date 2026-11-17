@@ -149,7 +149,7 @@
     const basePath = document.documentElement.getAttribute('data-base-path') || '/';
     const initialSection = document.documentElement.getAttribute('data-initial-section') || 'home';
     const navLinks = document.querySelectorAll('[data-nav-section]');
-    const sectionIds = ['home', 'works', 'creations', 'about', 'services', 'contacts'];
+    const sectionIds = ['home', 'works', 'creations', 'about', 'services', 'contacts', 'support'];
     const sections = sectionIds.map((id) => document.getElementById(id)).filter(Boolean);
 
     // Immediately strip any .php or .html if ever present in location.pathname
@@ -865,6 +865,49 @@
     setInterval(() => sendHeartbeat(false), 8000);
   }
 
+  /**
+   * 10. Creator Support & InstaPay QR Terminal Controller
+   */
+  function initSupportSection() {
+    const qrModal = document.getElementById('support-qr-modal-backdrop');
+    const tierBadge = document.getElementById('selected-tier-badge');
+    const copyBtn = document.getElementById('btn-copy-acct-name');
+
+    // Open full-size QR scanner modal
+    document.addEventListener('click', (e) => {
+      const qrTrigger = e.target.closest('[data-open-support-qr]');
+      if (qrTrigger && qrModal) {
+        qrModal.classList.add('open');
+      }
+    });
+
+    // Tier selection pills
+    document.querySelectorAll('[data-support-tier]').forEach((pill) => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('[data-support-tier]').forEach((p) => p.classList.remove('active'));
+        pill.classList.add('active');
+        const label = pill.getAttribute('data-support-tier') || 'Coffee Fuel';
+        if (tierBadge) {
+          tierBadge.textContent = `✓ ${label.toUpperCase()}`;
+        }
+      });
+    });
+
+    // Copy Account Name button
+    if (copyBtn) {
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText('JOHN PAUL TUANGCO');
+          const orig = copyBtn.textContent;
+          copyBtn.textContent = '✓ COPIED: JOHN PAUL TUANGCO';
+          setTimeout(() => {
+            copyBtn.textContent = orig;
+          }, 2200);
+        } catch (_) {}
+      });
+    }
+  }
+
   window.addEventListener('DOMContentLoaded', () => {
     initHudClock();
     initThemeEngine();
@@ -873,6 +916,7 @@
     initCleanUrlNavigation();
     initContactForm();
     initRealtimeVisitors();
+    initSupportSection();
     window.cyberSnakeGame = new CyberSnakeGame();
     window.cyberRubikGame = new CyberRubikGame();
   });
